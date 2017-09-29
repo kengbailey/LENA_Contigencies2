@@ -10,8 +10,21 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 
 from Tkinter import *
-from Batch import Batch
-from SeqAnalysis2 import SeqAnalysis
+from LenaUI import *
 import time
+
+
+def main():
+    # Launch UI
+    root = Tk()
+    Lena = LenaUI(root)
+    root.mainloop()
+
+    # Launch database
+    #
+    
+if __name__ == "__main__":
+    main()
+
 
 

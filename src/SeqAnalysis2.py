@@ -14,8 +14,6 @@ import xml.etree.ElementTree as ET
 from copy import deepcopy
 import os
 
-VERBOSE = True
-
 # Event Item
 class EItem:
 	def __init__(self, attr):
@@ -161,18 +159,6 @@ class EItemList:
 		rt += str(self.contingencies["a"]) + ',' + str(self.contingencies["b"]) + ',' + str(self.contingencies["c"]) + ',' + str(self.contingencies["d"])
 		return rt
 
-class SAFSM():
-	def __init__(self):
-		# Define States
-		self.INIT = 0
-		self.SCAN_COPY_XML = 1
-		self.INSERT_PAUSES = 2
-		self.TALLY_PASS = 3
-		self.PRIMARY_ANALYSIS = 4
-		self.WRITE_RESULTS = 5
-		# Initial Transition
-		self.Transition( self.INIT )
-
 class SeqAnalysis:
 	def __init__(self, _varMap={}, pID=None, fpaths=[]):
 		self.pID=pID
@@ -182,9 +168,8 @@ class SeqAnalysis:
 			self.Perform(fpath)
 
 	def Perform(self, path):
+		# Announce
 		print 'Analysis in progress on pID=' + str(self.pID) + ', file=' + path
-		# Init FSM object
-		#fsm = SAFSM()
 
 		# Define necessary objects
 		eiList = None
