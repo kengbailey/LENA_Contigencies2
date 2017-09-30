@@ -14,6 +14,9 @@ from Tkinter import *
 from Batch import Batch
 from SeqAnalysis2 import SeqAnalysis
 import os
+import platform
+
+MAC = 'Darwin'
 
 class LenaUI:
 
@@ -38,4 +41,5 @@ class LenaUI:
         btm_frame.grid(row=2, sticky="ew")
 
         # OSX ONLY - bring window to front
-        os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
+        if platform.system() == MAC:
+            os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
