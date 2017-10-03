@@ -38,12 +38,20 @@ class LenaUI:
         root.grid_rowconfigure(1, weight=1)
         root.grid_columnconfigure(0, weight=1)
 
-        # layout 
         top_frame.grid(row=0, sticky="ew")
         sep_frame1.grid(row=1, sticky="ew")
         mid_frame.grid(row=2, sticky="nsew")
         sep_frame2.grid(row=3, sticky="ew")
         btm_frame.grid(row=4, sticky="ew")
+
+        """ TOP FRAME """
+        # create widgets for top_frame
+        tf_title_label = Label(top_frame, text="Specify Directory")
+        tf_in_label = Label(top_frame, text="Input: ")
+
+        # layout widgets in top_frame
+        tf_title_label.grid(row=0, columnspan=1)
+        tf_in_label.grid(row=1, columnspan=1)
 
         # OSX ONLY - bring window to front
         if platform.system() == MAC:
