@@ -19,16 +19,19 @@ import platform
 MAC = 'Darwin'
 
 class LenaUI:
-
+    "This class is the UI and associated actions"
     def __init__(self, root):
+        "UI started on init of class"        
         self.root = root
         root.title("LENA Contingencies")
         root.geometry('{}x{}'.format(500, 700))
         root.resizable(False, False)
         
         # create all of the main containers
-        top_frame = Frame(root, bg='white', width=500, height=300)
-        mid_frame = Frame(root, bg='white', width=500, height=300)
+        top_frame = Frame(root, bg='white', width=500, height=295)
+        sep_frame1 = Frame(root, bg='grey', width=500, height=5)
+        mid_frame = Frame(root, bg='white', width=500, height=295)
+        sep_frame2 = Frame(root, bg='grey', width=500, height=5)
         btm_frame = Frame(root, bg='white', width=500, height=100)
 
         # layout main containers
@@ -37,8 +40,10 @@ class LenaUI:
 
         # layout 
         top_frame.grid(row=0, sticky="ew")
-        mid_frame.grid(row=1, sticky="nsew")
-        btm_frame.grid(row=2, sticky="ew")
+        sep_frame1.grid(row=1, sticky="ew")
+        mid_frame.grid(row=2, sticky="nsew")
+        sep_frame2.grid(row=3, sticky="ew")
+        btm_frame.grid(row=4, sticky="ew")
 
         # OSX ONLY - bring window to front
         if platform.system() == MAC:
