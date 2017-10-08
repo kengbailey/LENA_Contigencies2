@@ -106,7 +106,7 @@ class LenaUI:
         mid_abc_b_btn.grid(row=5, column=4)
         mid_filler_label2.grid(row=5, column=2)
         mid_abc_c_btn.grid(row=5, column=5)
-        mid_filler_label3.grid(row=6, column=0, columnspan=3)
+        mid_filler_label.grid(row=6, column=0, columnspan=3)
 
         # OSX ONLY - bring window to front
         if platform.system() == MAC:
