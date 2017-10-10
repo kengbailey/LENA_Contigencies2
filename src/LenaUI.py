@@ -83,6 +83,7 @@ class LenaUI:
         abc_a_var = StringVar()
         abc_b_var = StringVar()
         abc_c_var = StringVar()
+        pause_var = BooleanVar()
         mid_type_label = ttk.Label(mid_frame, text='Type of Analysis')       
         mid_ab_btn = ttk.Radiobutton(mid_frame, text='A ---> B', variable=type_var, value='ab')
         mid_abc_btn = ttk.Radiobutton(mid_frame, text='( A ---> B ) ---> C', variable=type_var, value='abc')        
@@ -97,7 +98,12 @@ class LenaUI:
         mid_filler_label2 = ttk.Label(mid_frame, text="-----")
         mid_pause_label = ttk.Label(mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(mid_frame, text="     ")
-
+        mid_pause_slider = ttk.Scale(mid_frame, orient=HORIZONTAL, length=100, from_=1.0, to=50.0)
+        mid_pause_dn_btn = ttk.Button(mid_frame, text="<", command=self.testing123, width=2)
+        mid_pause_up_btn = ttk.Button(mid_frame, text=">", command=self.testing123, width=2)
+        mid_pause_entry = ttk.Entry(mid_frame, width=3)
+        mid_pause_checkbox = ttk.Checkbutton(mid_frame, text="Enable rounding", command=self.testing123)
+        
         # setup mid frame widgets
         mid_type_label.grid(row=0, column=1, columnspan=3)
         mid_ab_btn.grid(row=1, column=1, columnspan=3)
@@ -112,6 +118,22 @@ class LenaUI:
         mid_abc_c_btn.grid(row=5, column=5)
         mid_filler_label3.grid(row=6, column=0, columnspan=3)
         mid_pause_label.grid(row=7, column=0, columnspan=4)
+        mid_pause_slider.grid(row=8, column=1, columnspan=3)
+        mid_pause_dn_btn.grid(row=8, column=4)
+        mid_pause_up_btn.grid(row=8, column=5)
+        mid_pause_entry.grid(row=8, column=0)
+        mid_pause_checkbox.grid(row=9, column=1, columnspan=3)
+
+        # BOTTOM FRAME CONFIG
+        # create bottom frame widgets
+        btm_submit_btn = ttk.Button(btm_frame, text="Submit", command=self.testing123)
+        btm_progress_bar = ttk.Progressbar(btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
+        btm_text_window = Text(btm_frame, width=50, height=3)
+
+        # arrange bottom frame widgets
+        btm_submit_btn.grid(row=0, column=0)
+        btm_progress_bar.grid(row=0, column=1)
+        btm_text_window.grid(row=1, column=0, columnspan=2)
 
         # OSX ONLY - bring window to front
         if platform.system() == MAC:
