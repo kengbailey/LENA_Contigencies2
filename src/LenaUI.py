@@ -9,7 +9,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import ttk
+import ttk, tkFileDialog
 from Tkinter import *
 from Batch import Batch
 from SeqAnalysis2 import SeqAnalysis
@@ -63,25 +63,37 @@ class LenaUI:
     def setup_top_frame(self):
         # TOP FRAME CONFIG
         # Create top frame widgets
+        in_path_var = StringVar()   # holds path for input directory //J
+        out_path_var = StringVar()  # holds path for output directory   //J
         csv_var = BooleanVar() # holds user selection for csv output
         txt_var = BooleanVar() # holds user selection for txt output
         xl_var = BooleanVar()  # holds user selection for xlsx output
+
         top_dir_label = ttk.Label(self.top_frame, text="Specify Directory")
         top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.testing123)
         top_load_btn = ttk.Button(self.top_frame, text="LOAD", command=self.testing123)
-        top_input_label = ttk.Label(self.top_frame, text="Input:")
+        top_input_label = ttk.Label(self.top_frame, text="   Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
         top_format_label = ttk.Label(self.top_frame, text="Output Format")        
         top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.testing123, variable=csv_var,onvalue=1, offvalue=0)
         top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.testing123, variable=txt_var,onvalue=1, offvalue=0)
         top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.testing123, variable=xl_var,onvalue=1, offvalue=0)
         top_filler = ttk.Label(self.top_frame, text="      ")
+        top_in_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=tkFileDialog.askdirectory)    #Browse button for input directory //J
+        top_out_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=tkFileDialog.askdirectory)   #Browse button for output directory //J
+        top_in_path = Entry(self.top_frame, width=20, textvariable=in_path_var, state=DISABLED)     #create the label to display input directory path //J      
+        top_out_path = Entry(self.top_frame, width=20, textvariable=out_path_var, state=DISABLED)   #create the label to display output directory path //J
         
         # setup top frame widgets
         top_reset_btn.grid(row=0, column=4, sticky=E)
         top_dir_label.grid(row=1, column=0, columnspan=2, sticky=N)
         top_input_label.grid(row=2, column=0)
         top_output_label.grid(row=3, column=0)
+        top_in_browse_btn.grid(row=3, column=1) #
+        top_out_browse_btn.grid(row=4, column=1)#
+        top_in_path.grid(row=3, column=2) #
+        top_out_path.grid(row=4, column=2)#
+        
         top_format_label.grid(row=5, column=0, columnspan=2)
         top_filler.grid(row=4, column=0)
         top_csv_btn.grid(row=6, column=0)
