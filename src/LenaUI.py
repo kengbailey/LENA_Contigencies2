@@ -35,9 +35,16 @@ class LenaUI:
         # create menu
         menubar = Menu(root) # create menu bar
         root.config(menu=menubar) # attach menubar to root window
+
+        # file menu
         file_menu = Menu(menubar) # create "File" menu item 
         file_menu.add_command(label="Exit", command=self.testing123) # add a command to "File" menu item
         menubar.add_cascade(label="File", menu=file_menu)   # attach "File" menu item to menubar
+        
+        # help menu
+        help_menu = Menu(menubar) # create "Help" menu item 
+        help_menu.add_command(label="Instructions", command=self.testing123) # add a command to "Help" menu item
+        menubar.add_cascade(label="Help", menu=help_menu) # attach "Help" menu item to helpbar
 
         # setup main frames to grid
         # top, mid, btm frames laid out inside main_frame
