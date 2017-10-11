@@ -91,8 +91,8 @@ class LenaUI:
         top_output_label.grid(row=3, column=0)
         top_in_browse_btn.grid(row=2, column=1) #
         top_out_browse_btn.grid(row=3, column=1)#
-        top_in_path.grid(row=2, column=2) #
-        top_out_path.grid(row=3, column=2)#
+        top_in_path.grid(row=2, column=2, columnspan=2) #
+        top_out_path.grid(row=3, column=2, columnspan=2)#
         
         top_format_label.grid(row=5, column=0, columnspan=2)
         top_filler.grid(row=4, column=0)
