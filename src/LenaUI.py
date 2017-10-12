@@ -96,10 +96,10 @@ class LenaUI:
         top_dir_label.grid(row=1, column=0, columnspan=2, sticky=N)
         top_input_label.grid(row=2, column=0)
         top_output_label.grid(row=3, column=0)
-        top_in_browse_btn.grid(row=2, column=1) #
-        top_out_browse_btn.grid(row=3, column=1)#
-        top_in_path.grid(row=2, column=2, columnspan=2) #
-        top_out_path.grid(row=3, column=2, columnspan=2)#
+        top_in_browse_btn.grid(row=2, column=3) #
+        top_out_browse_btn.grid(row=3, column=3)#
+        top_in_path.grid(row=2, column=1, columnspan=2) #
+        top_out_path.grid(row=3, column=1, columnspan=2)#
         
         top_format_label.grid(row=5, column=0, columnspan=2)
         top_filler.grid(row=4, column=0)
@@ -183,6 +183,6 @@ class LenaUI:
         btm_text_window = Text(self.btm_frame, width=50, height=3)
 
         # arrange bottom frame widgets
-        btm_submit_btn.grid(row=0, column=0)
-        btm_progress_bar.grid(row=0, column=1)
+        btm_submit_btn.grid(row=0, column=1)
+        btm_progress_bar.grid(row=0, column=0)
         btm_text_window.grid(row=1, column=0, columnspan=2)
