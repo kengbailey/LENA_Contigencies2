@@ -96,10 +96,10 @@ class LenaUI:
         top_dir_label.grid(row=1, column=0, columnspan=2, sticky=N)
         top_input_label.grid(row=2, column=0)
         top_output_label.grid(row=3, column=0)
-        top_in_browse_btn.grid(row=2, column=3) #
-        top_out_browse_btn.grid(row=3, column=3)#
-        top_in_path.grid(row=2, column=1, columnspan=2) #
-        top_out_path.grid(row=3, column=1, columnspan=2)#
+        top_in_browse_btn.grid(row=2, column=1) #
+        top_out_browse_btn.grid(row=3, column=1)#
+        top_in_path.grid(row=2, column=2, columnspan=2) #
+        top_out_path.grid(row=3, column=2, columnspan=2)#
         
         top_format_label.grid(row=5, column=0, columnspan=2)
         top_filler.grid(row=4, column=0)
@@ -141,7 +141,7 @@ class LenaUI:
         mid_abc_b_btn['values'] = codes
         mid_abc_c_btn = ttk.Combobox(self.mid_frame, textvariable=abc_c_var, width=8)
         mid_abc_c_btn['values'] = codes   
-        mid_filler_label2 = ttk.Label(self.mid_frame, text="-----")
+        mid_filler_label2 = ttk.Label(self.mid_frame, text="     ")
         mid_pause_label = ttk.Label(self.mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(self.mid_frame, text="     ")
         mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=1.0, to=50.0)
@@ -152,28 +152,27 @@ class LenaUI:
         
         # setup mid frame widgets
         mid_type_label.grid(row=0, column=1, columnspan=3)
-        mid_ab_btn.grid(row=1, column=1, columnspan=3)
-        mid_abc_btn.grid(row=2, column=1, columnspan=3)
-        mid_filler_label.grid(row=3, column=0, columnspan=3)
-        mid_conf_label.grid(row=4, column=1, columnspan=4)
-        mid_conf_ab_a_label.grid(row=5, column=0)
-        mid_conf_ab_b_label.grid(row=5, column=1)
-        mid_conf_abc_a_label.grid(row=5, column=3, columnspan=1)
-        mid_conf_abc_b_label.grid(row=5, column=3, columnspan=3)
-        mid_conf_abc_c_label.grid(row=5, column=5, columnspan=4)
-        mid_ab_a_btn.grid(row=6, column=0)
-        mid_ab_b_btn.grid(row=6, column=1)
-        mid_abc_a_btn.grid(row=6, column=3)
-        mid_abc_b_btn.grid(row=6, column=4)
-        mid_filler_label2.grid(row=6, column=2)
-        mid_abc_c_btn.grid(row=6, column=5)
-        mid_filler_label3.grid(row=7, column=0, columnspan=3)
-        mid_pause_label.grid(row=8, column=0, columnspan=4)
-        mid_pause_slider.grid(row=9, column=1, columnspan=3)
-        mid_pause_dn_btn.grid(row=9, column=4)
-        mid_pause_up_btn.grid(row=9, column=5)
-        mid_pause_entry.grid(row=9, column=0)
-        mid_pause_checkbox.grid(row=10, column=1, columnspan=3)
+        mid_ab_btn.grid(row=2, column=0, columnspan=3, sticky = W)
+        mid_abc_btn.grid(row=8, column=0, columnspan=3, sticky = W)
+        #mid_conf_label.grid(row=1, column=1, columnspan=4)
+        mid_conf_ab_a_label.grid(row=4, column=0)
+        mid_conf_ab_b_label.grid(row=4, column=1)
+        mid_conf_abc_a_label.grid(row=9, column=0)
+        mid_conf_abc_b_label.grid(row=9, column=1)
+        mid_conf_abc_c_label.grid(row=9, column=2)
+        mid_ab_a_btn.grid(row=5, column=0)
+        mid_ab_b_btn.grid(row=5, column=1)
+        mid_abc_a_btn.grid(row=10, column=0)
+        mid_abc_b_btn.grid(row=10, column=1)
+        mid_filler_label2.grid(row=7, column=2)
+        mid_abc_c_btn.grid(row=10, column=2)
+        mid_filler_label3.grid(row=12, column=0, columnspan=3)
+        mid_pause_label.grid(row=13, column=1, columnspan=3)
+        mid_pause_slider.grid(row=14, column=1, columnspan=3)
+        mid_pause_dn_btn.grid(row=14, column=4)
+        mid_pause_up_btn.grid(row=14, column=5)
+        mid_pause_entry.grid(row=14, column=0, sticky = E)
+        mid_pause_checkbox.grid(row=15, column=1, columnspan=3)
 
     def setup_btm_frame(self):
         # BOTTOM FRAME CONFIG
@@ -183,6 +182,6 @@ class LenaUI:
         btm_text_window = Text(self.btm_frame, width=50, height=3)
 
         # arrange bottom frame widgets
-        btm_submit_btn.grid(row=0, column=1)
-        btm_progress_bar.grid(row=0, column=0)
+        btm_submit_btn.grid(row=0, column=0)
+        btm_progress_bar.grid(row=0, column=1)
         btm_text_window.grid(row=1, column=0, columnspan=2)
