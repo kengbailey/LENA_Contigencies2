@@ -26,6 +26,18 @@ class LenaUI:
         root.resizable(False, False)
         root.title("LENA Contingencies")
 
+        # Class Attributes
+        self.its_file_dict = {} # k:ID v:path/to/file
+        self.input_dir = None
+        self.output_dir = None
+        self.pause_duration = None
+        self.rounding_enabled = None
+        self.sequence_type = None
+        self.var_a = None
+        self.var_b = None
+        self.var_c = None
+        self.output_format = None
+
         # Create main frames
         main_frame = ttk.Frame(root) # top, mid, btm frames embedded within this frame
         self.top_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=300, height=150)
@@ -185,3 +197,30 @@ class LenaUI:
         btm_submit_btn.grid(row=0, column=0)
         btm_progress_bar.grid(row=0, column=1)
         btm_text_window.grid(row=1, column=0, columnspan=2)
+
+    def get_its_files(self):
+        "This method looks creates a dict of all .its files found in the input directory"
+
+    def run_seqanalysis(self):
+        "This method performs the sequence analysis on all .its files"
+
+    def load_config(self):
+        "This method loads a config file for the program"
+
+    def reset_config(self):
+        "This method resets the all program options"
+    
+    def save_config(self):
+        "This method allows the user to save the program's current configuration"
+    
+    def load_instruction_window(self):
+        "This method loads a separate window with program instructions"
+
+    def ouput_txt(self):
+        "This method outputs the analysis results to a .txt file"
+
+    def output_csv(self):
+        "This method outputs the analysis results to a .csv file"
+
+    def output_xlsx(self):
+        "This method outputs the analysis results to a .xlsx file"
