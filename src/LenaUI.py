@@ -92,7 +92,7 @@ class LenaUI:
         top_out_path = Entry(self.top_frame, width=20, textvariable=out_path_var, state=DISABLED)   #create the label to display output directory path //J
         
         # setup top frame widgets
-        top_reset_btn.grid(row=0, column=4, sticky=E)
+        top_reset_btn.grid(row=0, column=3, sticky=E)
         top_dir_label.grid(row=1, column=0, columnspan=2, sticky=N)
         top_input_label.grid(row=2, column=0, sticky=E)
         top_output_label.grid(row=3, column=0, sticky=E)
@@ -106,7 +106,7 @@ class LenaUI:
         top_csv_btn.grid(row=6, column=0)
         top_txt_btn.grid(row=6, column=1)
         top_xl_btn.grid(row=6, column=2)
-        top_load_btn.grid(row=0, column=3)
+        top_load_btn.grid(row=0, column=2)
 
     def setup_mid_frame(self):
         # MID FRAME CONFIG
