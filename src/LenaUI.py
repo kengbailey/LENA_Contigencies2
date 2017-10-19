@@ -19,6 +19,9 @@ import threading
 import time
 
 MAC = 'Darwin'
+OK = 'ok'
+AB = 'A_B'
+ABC = 'AB_C'
 
 class LenaUI:
 
@@ -34,7 +37,7 @@ class LenaUI:
         self.input_dir = StringVar()
         self.output_dir = StringVar()
         self.pause_duration = None
-        self.rounding_enabled = None
+        self.rounding_enabled = False
         self.sequence_type = None
         self.var_a = None
         self.var_b = None
@@ -219,33 +222,82 @@ class LenaUI:
 
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
+        self.its_file_dict = Batch(self.input_dir)
+
+    def check_config(self):
+        "This method checks if all seq_config values are set. Returns error message if any aren't set."
+
+        # Error messages stored here
+        error = ""
+
+        # check input directory
+        if len(self.input_dir) < 1:
+            error += "Input directory not set! "
+        
+        # check output directory
+        if len(self.output_dir) < 1:
+            error += "Output directory not set! "
+        
+        # check var_a
+        if self.var_a is None:
+            error += "A is not set! "
+
+        # check var_b
+        if self.var_b is None:
+            error += "B is not set! "
+
+        # check var_c
+        if self.var_c is None:
+            error += "C is not set! "
+        
+        # check output_format
+        if len(self.output_format) == 0:
+            error += "Output format not set! "
+        
+        # check sequence_type
+        if len(self.sequence_type) < 1:
+            error += "Sequence Type not set! "
+
+        # check if any config values not set
+        if len(error) > 1:
+            return error
+        else:
+            return OK
 
     def set_config(self):
+        "This method sets the self.seq_config variable - returns True if successful, False if unsuccessful"
 
-        # check and set self.var_a
-        if self.var_a != None:
-            errorVal = "Error! Val_a not set!"
-        else:
-            self.seq_config['A'] = self.var_a
+        # check if config options set
+        errorVal = self.check_config()
+        if errorVal != OK:
+            # call method to print error to screen
+            # return error
+            return False
 
-        # check if any errors occured
-        if errorVal != "":
-            return errorVal
-        else:
-            return ""
+        # all config options set, so fill self.seq_config
+        self.seq_config['batDir'] = self.input_dir
+        self.seq_config['A'] = self.var_a
+        self.seq_config['B'] = self.var_b
+        self.seq_config['C'] = self.var_c
+        self.seq_config['outputContent'] = ""
+        self.seq_config['roundingEnabled'] = self.rounding_enabled
+        self.seq_config['P'] = 'Pause'
+        self.seq_config['outputDirPath'] = ""
+        self.seq_config['seqType'] = self.sequence_type
+        self.seq_config['PauseDur'] = self.pause_duration
+
+        return True
+
+        
 
     def run_seqanalysis(self):
         "This method performs the sequence analysis on all .its files"
         
         # call setconfig
-        r = self.seq_config
+        r = self.set_config()
 
         test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
         test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
-
-        # get batch of its files
-        batch = Batch(test_batDir)
-        print(len(batch.items))
 
         # threading vars
         results = []
@@ -256,7 +308,7 @@ class LenaUI:
         t = time.time()
 
         # run analysis on all found .its files
-        for k,v in batch.items.iteritems():
+        for k,v in self.its_file_dict.items.iteritems():
             
             sa = SeqAnalysis(test_config, k, v)
             proc = threading.Thread(target=sa.Perform, args=(str(v[0]), results, tLock))
