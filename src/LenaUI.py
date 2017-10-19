@@ -19,6 +19,7 @@ import platform
 MAC = 'Darwin'
 
 class LenaUI:
+
     "This class is the UI and associated actions"
     def __init__(self, root):
         "UI started on init of class"        
@@ -60,6 +61,13 @@ class LenaUI:
         print("testing 123...")
         print(event)
 
+    def change_pause_legnthU(event, pause_length_var):
+        pause_length_var.set(pause_length_var.get()+1.0)
+
+    def change_pause_lengthD(event, pause_length_var):
+        if pause_length_var.get() > 1.0:
+            pause_length_var.set(pause_length_var.get()-1.0)
+
     def setup_top_frame(self):
         # TOP FRAME CONFIG
         # Create top frame widgets
@@ -98,6 +106,7 @@ class LenaUI:
         abc_a_var = StringVar()
         abc_b_var = StringVar()
         abc_c_var = StringVar()
+        pause_length_var = DoubleVar()
         pause_var = BooleanVar()
         mid_type_label = ttk.Label(self.mid_frame, text='Type of Analysis')       
         mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=type_var, value='ab')
@@ -113,12 +122,13 @@ class LenaUI:
         mid_filler_label2 = ttk.Label(self.mid_frame, text="-----")
         mid_pause_label = ttk.Label(self.mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(self.mid_frame, text="     ")
-        mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=1.0, to=50.0)
-        mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=self.testing123, width=2)
-        mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=self.testing123, width=2)
-        mid_pause_entry = ttk.Entry(self.mid_frame, width=3)
+        mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=1.0, to=50.0, variable=pause_length_var)
+        mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(pause_length_var), width=2)
+        mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(pause_length_var), width=2)
+        mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=pause_length_var, width=3)
         mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", command=self.testing123)
-        
+
+
         # setup mid frame widgets
         mid_type_label.grid(row=0, column=1, columnspan=3)
         mid_ab_btn.grid(row=1, column=1, columnspan=3)
