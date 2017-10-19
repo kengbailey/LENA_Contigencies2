@@ -359,3 +359,6 @@ class LenaUI:
 
     def set_config_from_file(self, config):
         "This method applies the config variable passed to it to the program"
+
+    def reset_all_widgets(self):
+        "This method resets all widgets"
