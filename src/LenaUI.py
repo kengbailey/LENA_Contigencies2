@@ -34,6 +34,7 @@ class LenaUI:
 
         # Class Attributes
         self.its_file_dict = {} # k:ID v:path/to/file
+        self.seq_config = {}
         self.input_dir = StringVar()
         self.output_dir = StringVar()
         self.pause_duration = None
@@ -43,7 +44,7 @@ class LenaUI:
         self.var_b = None
         self.var_c = None
         self.output_format = []
-        self.seq_config = {}
+        
 
         # Create main frames
         main_frame = ttk.Frame(root) # top, mid, btm frames embedded within this frame
@@ -333,7 +334,7 @@ class LenaUI:
             self.output_xlsx(results)
         
         # send success message to window
-        
+
 
     def load_config(self):
         "This method loads a config file for the program"
@@ -355,3 +356,6 @@ class LenaUI:
 
     def output_xlsx(self, results):
         "This method outputs the analysis results to a .xlsx file"
+
+    def set_config_from_file(self, config):
+        "This method applies the config variable passed to it to the program"
