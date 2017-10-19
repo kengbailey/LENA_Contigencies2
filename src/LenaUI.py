@@ -29,8 +29,8 @@ class LenaUI:
 
         # Class Attributes
         self.its_file_dict = {} # k:ID v:path/to/file
-        self.input_dir = None
-        self.output_dir = None
+        self.input_dir = StringVar()
+        self.output_dir = StringVar()
         self.pause_duration = None
         self.rounding_enabled = None
         self.sequence_type = None
@@ -90,8 +90,6 @@ class LenaUI:
     def setup_top_frame(self):
         # TOP FRAME CONFIG
         # Create top frame widgets
-        in_path_var = StringVar()   # holds path for input directory //J
-        out_path_var = StringVar()  # holds path for output directory   //J
         csv_var = BooleanVar() # holds user selection for csv output
         txt_var = BooleanVar() # holds user selection for txt output
         xl_var = BooleanVar()  # holds user selection for xlsx output
@@ -106,20 +104,20 @@ class LenaUI:
         top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.testing123, variable=txt_var,onvalue=1, offvalue=0)
         top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.testing123, variable=xl_var,onvalue=1, offvalue=0)
         top_filler = ttk.Label(self.top_frame, text="      ")
-        top_in_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=tkFileDialog.askdirectory)    #Browse button for input directory //J
-        top_out_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=tkFileDialog.askdirectory)   #Browse button for output directory //J
-        top_in_path = Entry(self.top_frame, width=20, textvariable=in_path_var, state=DISABLED)     #create the label to display input directory path //J      
-        top_out_path = Entry(self.top_frame, width=20, textvariable=out_path_var, state=DISABLED)   #create the label to display output directory path //J
+        top_in_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_input_dir)    #Browse button for input directory //J
+        top_out_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_output_dir)   #Browse button for output directory //J
+        self.top_in_path = Entry(self.top_frame, width=20, textvariable=self.input_dir, state=DISABLED)     #create the label to display input directory path //J      
+        self.top_out_path = Entry(self.top_frame, width=20, textvariable=self.output_dir, state=DISABLED)   #create the label to display output directory path //J
         
         # setup top frame widgets
         top_reset_btn.grid(row=0, column=3, sticky=E)
         top_dir_label.grid(row=1, column=0, columnspan=2, sticky=N)
         top_input_label.grid(row=2, column=0, sticky=E)
         top_output_label.grid(row=3, column=0, sticky=E)
-        top_in_browse_btn.grid(row=2, column=1) #
-        top_out_browse_btn.grid(row=3, column=1)#
-        top_in_path.grid(row=2, column=2, columnspan=2) #
-        top_out_path.grid(row=3, column=2, columnspan=2)#
+        top_in_browse_btn.grid(row=2, column=3) #
+        top_out_browse_btn.grid(row=3, column=3)#
+        self.top_in_path.grid(row=2, column=1, columnspan=2) #
+        self.top_out_path.grid(row=3, column=1, columnspan=2)#
         
         top_format_label.grid(row=5, column=0, columnspan=2)
         top_filler.grid(row=4, column=0)
@@ -207,8 +205,13 @@ class LenaUI:
         btm_submit_btn.grid(row=0, column=0)
         btm_progress_bar.grid(row=0, column=1)
         btm_text_window.grid(row=1, column=0, columnspan=2)
-<<<<<<< HEAD
-=======
+
+
+    def select_input_dir(self):
+        self.input_dir.set(tkFileDialog.askdirectory())
+
+    def select_output_dir(self):
+        self.output_dir.set(tkFileDialog.askdirectory())
 
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
@@ -236,4 +239,4 @@ class LenaUI:
 
     def output_xlsx(self):
         "This method outputs the analysis results to a .xlsx file"
->>>>>>> d03033c0c4cc16852271fcc260387261c9ea1cb0
+
