@@ -42,7 +42,7 @@ class LenaUI:
         self.var_a = None
         self.var_b = None
         self.var_c = None
-        self.output_format = None
+        self.output_format = []
         self.seq_config = {}
 
         # Create main frames
@@ -325,7 +325,15 @@ class LenaUI:
         print(str(results))
 
         # output file
-        # based on self.
+        if 'csv' in self.output_format:
+            self.output_csv(results)
+        if 'txt' in self.output_format:
+            self.ouput_txt(results)
+        if 'xlsx' in self.output_format:
+            self.output_xlsx(results)
+        
+        # send success message to window
+        
 
     def load_config(self):
         "This method loads a config file for the program"
@@ -339,11 +347,11 @@ class LenaUI:
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
 
-    def ouput_txt(self):
+    def ouput_txt(self, results):
         "This method outputs the analysis results to a .txt file"
 
-    def output_csv(self):
+    def output_csv(self, results):
         "This method outputs the analysis results to a .csv file"
 
-    def output_xlsx(self):
+    def output_xlsx(self, results):
         "This method outputs the analysis results to a .xlsx file"
