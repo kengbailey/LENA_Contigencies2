@@ -84,11 +84,12 @@ class LenaUI:
         print(event)
 
     def change_pause_legnthU(self, event, pause_length_var):
-        pause_length_var.set(pause_length_var.get()+1.0)
+        if pause_length_var.get() < 50.0:
+            pause_length_var.set(pause_length_var.get()+0.1)
 
     def change_pause_lengthD(self, event, pause_length_var):
-        if pause_length_var.get() > 1.0:
-            pause_length_var.set(pause_length_var.get()-1.0)
+        if pause_length_var.get() >= 1.0:
+            pause_length_var.set(pause_length_var.get()-0.1)
 
     def setup_top_frame(self):
         # TOP FRAME CONFIG
