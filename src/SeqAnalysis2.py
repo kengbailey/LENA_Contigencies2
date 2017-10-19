@@ -159,14 +159,14 @@ class EItemList:
 		return rt
 
 class SeqAnalysis:
-	def __init__(self, _varMap={}, pID=None, fpaths=[]):
+	def __init__(self, varMap, pID, path):
 		self.pID=pID
-		self.fpaths=fpaths
-		self._varMap = _varMap
-		for fpath in self.fpaths:
-			self.Perform(fpath)
+		self.path=path
+		self.varMap = varMap
+		#for fpath in self.fpaths:
+		#	self.Perform(fpath)
 
-	def Perform(self, path):
+	def Perform(self, path, results, tLock):
 		# Announce
 		print 'Analysis in progress on pID=' + str(self.pID) + ', file=' + path
 
@@ -176,7 +176,7 @@ class SeqAnalysis:
 
 		# INITIALIZE ESSENTIAL OBJECTS
 		#Init event item list
-		eiList = EItemList(_varMap=self._varMap, pid=self.pID, its_filename=path)
+		eiList = EItemList(_varMap=self.varMap, pid=self.pID, its_filename=path)
 
 		#Load xml tree
 		tree = ET.parse(path)
@@ -206,8 +206,13 @@ class SeqAnalysis:
 		#write data and break from loop
 		elh = eiList.Header()
 		outputContent = ""
-		if self._varMap["outputContent"] is "":
-			outputContent = elh
-		outputContent += '\n' + eiList.ResultsTuple()
-		self._varMap["outputContent"] += outputContent
+		if len(results) == 0:
+			with tLock:
+				results.append(elh)
+
+		outputContent += eiList.ResultsTuple()
+
+		# write data with Lock on results
+		with tLock:
+			results.append(outputContent)
 

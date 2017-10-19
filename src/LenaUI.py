@@ -15,6 +15,8 @@ from Batch import Batch
 from SeqAnalysis2 import SeqAnalysis
 import os
 import platform
+import threading
+import time
 
 MAC = 'Darwin'
 
@@ -38,6 +40,7 @@ class LenaUI:
         self.var_b = None
         self.var_c = None
         self.output_format = None
+        self.seq_config = {}
 
         # Create main frames
         main_frame = ttk.Frame(root) # top, mid, btm frames embedded within this frame
@@ -76,14 +79,14 @@ class LenaUI:
         if platform.system() == MAC:
             os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
-    def testing123(event):
+    def testing123(self, event):
         print("testing 123...")
         print(event)
 
-    def change_pause_legnthU(event, pause_length_var):
+    def change_pause_legnthU(self, event, pause_length_var):
         pause_length_var.set(pause_length_var.get()+1.0)
 
-    def change_pause_lengthD(event, pause_length_var):
+    def change_pause_lengthD(self, event, pause_length_var):
         if pause_length_var.get() > 1.0:
             pause_length_var.set(pause_length_var.get()-1.0)
 
@@ -164,8 +167,8 @@ class LenaUI:
         mid_pause_label = ttk.Label(self.mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(self.mid_frame, text="     ")
         mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=1.0, to=50.0, variable=pause_length_var)
-        mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(pause_length_var), width=2)
-        mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(pause_length_var), width=2)
+        mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(self,pause_length_var), width=2)
+        mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(self,pause_length_var), width=2)
         mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=pause_length_var, width=3)
         mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", command=self.testing123)
 
@@ -197,7 +200,7 @@ class LenaUI:
     def setup_btm_frame(self):
         # BOTTOM FRAME CONFIG
         # create bottom frame widgets
-        btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.testing123)
+        btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.run_seqanalysis)
         btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
         btm_text_window = Text(self.btm_frame, width=50, height=3)
 
@@ -216,8 +219,60 @@ class LenaUI:
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
 
+    def set_config(self):
+
+        # check and set self.var_a
+        if self.var_a != None:
+            errorVal = "Error! Val_a not set!"
+        else:
+            self.seq_config['A'] = self.var_a
+
+        # check if any errors occured
+        if errorVal != "":
+            return errorVal
+        else:
+            return ""
+
     def run_seqanalysis(self):
         "This method performs the sequence analysis on all .its files"
+        
+        # call setconfig
+        r = self.seq_config
+
+        test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
+        test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
+
+        # get batch of its files
+        batch = Batch(test_batDir)
+        print(len(batch.items))
+
+        # threading vars
+        results = []
+        tLock = threading.Lock()
+        threads=[]
+
+        # testing
+        t = time.time()
+
+        # run analysis on all found .its files
+        for k,v in batch.items.iteritems():
+            
+            sa = SeqAnalysis(test_config, k, v)
+            proc = threading.Thread(target=sa.Perform, args=(str(v[0]), results, tLock))
+            threads.append(proc)
+            proc.start()
+            
+        # wait for threads to finish
+        for proc in threads:
+            proc.join()
+            print("thread done: "+proc.getName())
+
+        # testing
+        print("Time: "+str(time.time()-t))
+        print(str(results))
+
+        # output file
+        # based on self.
 
     def load_config(self):
         "This method loads a config file for the program"
@@ -239,4 +294,3 @@ class LenaUI:
 
     def output_xlsx(self):
         "This method outputs the analysis results to a .xlsx file"
-
