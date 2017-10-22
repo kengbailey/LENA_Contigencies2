@@ -58,7 +58,7 @@ class LenaUI:
 
         # file menu
         file_menu = Menu(menubar) # create "File" menu item 
-        file_menu.add_command(label="Exit", command=self.testing123) # add a command to "File" menu item
+        file_menu.add_command(label="Exit", command=self.close_program) # add a command to "File" menu item
         menubar.add_cascade(label="File", menu=file_menu)   # attach "File" menu item to menubar
         
         # help menu
@@ -361,3 +361,7 @@ class LenaUI:
 
     def reset_all_widgets(self):
         "This method resets all widgets"
+
+    def close_program(self):
+        "This method closes the program"
+        self.root.quit()
