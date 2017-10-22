@@ -210,9 +210,9 @@ class LenaUI:
         btm_text_window = Text(self.btm_frame, width=50, height=3)
 
         # arrange bottom frame widgets
-        btm_submit_btn.grid(row=0, column=0)
-        btm_progress_bar.grid(row=0, column=1)
-        btm_text_window.grid(row=1, column=0, columnspan=2)
+        btm_submit_btn.grid(row=0, column=1)
+        btm_progress_bar.grid(row=0, column=0)
+        btm_text_window.grid(row=1, column=0, columnspan=4)
 
 
     def select_input_dir(self):
