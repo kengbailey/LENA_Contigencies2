@@ -218,7 +218,7 @@ class LenaUI:
 
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
-        self.its_file_dict = Batch(self.input_dir)
+        self.its_file_dict = Batch(self.input_dir.get())
 
     def check_config(self):
         "This method checks if all seq_config values are set. Returns error message if any aren't set."
@@ -244,14 +244,15 @@ class LenaUI:
             return "B is not set! "
 
         # check var_c
-        while (self.sequence_type.get() == ABC):
+        if (self.sequence_type.get() == ABC):
             if len(str(self.var_c.get())) < 2:
                 return "C is not set! "
 
         # check output_format
         if len(self.output_format) == 0:
             return "Output format not set! "
-        
+        else:
+            print("Config SET")
         
 
         return OK
@@ -271,11 +272,11 @@ class LenaUI:
         self.seq_config['B'] = self.var_b.get()
         self.seq_config['C'] = self.var_c.get()
         self.seq_config['outputContent'] = ""
-        self.seq_config['roundingEnabled'] = self.rounding_enabled.get()
+        self.seq_config['roundingEnabled'] = str(self.rounding_enabled.get())
         self.seq_config['P'] = 'Pause'
         self.seq_config['outputDirPath'] = ""
         self.seq_config['seqType'] = self.sequence_type.get()
-        self.seq_config['PauseDur'] = self.pause_duration.get()
+        self.seq_config['PauseDur'] = str(round(self.pause_duration.get(), 1))
 
         return True
 
@@ -291,23 +292,28 @@ class LenaUI:
 
         print("Passed Tests!")
         print(str(self.seq_config))
-        return
+        #return
 
-        test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
-        test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
+        #test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
+        #test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
 
+        # testing
+        #self.input_dir.set("/Users/kennethbailey/school/LENA_Contigencies2")
+        testConfig = {'batDir': '/Users/kennethbailey/school/LENA_Contigencies2', 'A': 'FAF', 'C': '', 'B': 'FAF', 'roundingEnabled': 'True', 'P': 'Pause', 'outputContent': '', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '2.7'}
+        
         # threading vars
         results = []
         tLock = threading.Lock()
         threads=[]
-
+        self.get_its_files()
+        
         # testing
         t = time.time()
 
         # run analysis on all found .its files
         for k,v in self.its_file_dict.items.iteritems():
             
-            sa = SeqAnalysis(test_config, k, v)
+            sa = SeqAnalysis(self.seq_config, k, v)
             proc = threading.Thread(target=sa.Perform, args=(str(v[0]), results, tLock))
             threads.append(proc)
             proc.start()
@@ -320,7 +326,7 @@ class LenaUI:
         # testing
         print("Time: "+str(time.time()-t))
         print(str(results))
-
+        return
         # output file
         if 'csv' in self.output_format:
             self.output_csv(results)
