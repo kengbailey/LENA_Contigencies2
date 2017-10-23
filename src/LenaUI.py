@@ -202,13 +202,13 @@ class LenaUI:
         # create bottom frame widgets
         btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.run_seqanalysis)
         btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
-        self.btm_text_window = Text(self.btm_frame, width=50, height=5)
+        self.btm_text_window = Text(self.btm_frame, width=45, height=5)
         self.btm_text_window.config(state=DISABLED)
 
         # arrange bottom frame widgets
         btm_submit_btn.grid(row=0, column=1)
         btm_progress_bar.grid(row=0, column=0)
-        self.btm_text_window.grid(row=1, column=0, columnspan=4)
+        self.btm_text_window.grid(row=1, column=0, columnspan=2)
 
     def select_input_dir(self):
         self.input_dir.set(tkFileDialog.askdirectory())
