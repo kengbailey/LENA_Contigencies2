@@ -44,6 +44,8 @@ class LenaUI:
         self.var_b = None
         self.var_c = None
         self.output_format = []
+        self.output_msg = ""
+        self.output_msg_counter = 0
         
 
         # Create main frames
@@ -83,9 +85,8 @@ class LenaUI:
         if platform.system() == MAC:
             os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
-    def testing123(self, event):
-        print("testing 123...")
-        print(event)
+    def testing123(self):
+        self.write_to_window("Error! Var_a not set!")
 
     def change_pause_legnthU(self, event, pause_length_var):
         if pause_length_var.get() < 50.0:
@@ -205,14 +206,15 @@ class LenaUI:
     def setup_btm_frame(self):
         # BOTTOM FRAME CONFIG
         # create bottom frame widgets
-        btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.run_seqanalysis)
+        btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.testing123)
         btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
-        btm_text_window = Text(self.btm_frame, width=50, height=3)
+        self.btm_text_window = Text(self.btm_frame, width=50, height=5)
+        self.btm_text_window.config(state=DISABLED)
 
         # arrange bottom frame widgets
         btm_submit_btn.grid(row=0, column=1)
         btm_progress_bar.grid(row=0, column=0)
-        btm_text_window.grid(row=1, column=0, columnspan=4)
+        self.btm_text_window.grid(row=1, column=0, columnspan=4)
 
     def select_input_dir(self):
         self.input_dir.set(tkFileDialog.askdirectory())
@@ -365,3 +367,18 @@ class LenaUI:
     def close_program(self):
         "This method closes the program"
         self.root.quit()
+    
+    def write_to_window(self, message):
+        "This method writes text to message box"
+
+        # edit message text
+        self.output_msg_counter += 1
+        message = str(self.output_msg_counter)+": "+message +'\n'
+        self.output_msg = message + self.output_msg
+
+        # insert text
+        # we must enable window to edit contents
+        self.btm_text_window.config(state=NORMAL)
+        self.btm_text_window.delete(1.0,END)
+        self.btm_text_window.insert(END, self.output_msg)
+        self.btm_text_window.config(state=DISABLED)
