@@ -37,13 +37,14 @@ class LenaUI:
         self.seq_config = {}
         self.input_dir = StringVar()
         self.output_dir = StringVar()
-        self.pause_duration = None
-        self.rounding_enabled = False
-        self.sequence_type = None
-        self.var_a = None
-        self.var_b = None
-        self.var_c = None
+        self.pause_duration = DoubleVar()
+        self.rounding_enabled = BooleanVar()
+        self.sequence_type = StringVar()
+        self.var_a = StringVar()
+        self.var_b = StringVar()
+        self.var_c = StringVar()
         self.output_format = []
+        self.output_format.append(".csv") # set to csv default
         self.output_msg = ""
         self.output_msg_counter = 0
         
@@ -86,22 +87,22 @@ class LenaUI:
             os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
     def testing123(self):
-        self.write_to_window("Error! Var_a not set!")
+        self.write_to_window(str(self.sequence_type.get()))
 
-    def change_pause_legnthU(self, event, pause_length_var):
-        if pause_length_var.get() < 50.0:
-            pause_length_var.set(pause_length_var.get()+0.1)
+    def change_pause_legnthU(self, event):
+        if self.pause_duration.get() < 35.0:
+            self.pause_duration.set(self.pause_duration.get()+0.1)
 
-    def change_pause_lengthD(self, event, pause_length_var):
-        if pause_length_var.get() >= 0.1:
-            pause_length_var.set(pause_length_var.get()-0.1)
+    def change_pause_lengthD(self, event):
+        if self.pause_duration.get() >= 0.1:
+            self.pause_duration.set(self.pause_duration.get()-0.1)
 
     def setup_top_frame(self):
         # TOP FRAME CONFIG
         # Create top frame widgets
-        csv_var = BooleanVar() # holds user selection for csv output
-        txt_var = BooleanVar() # holds user selection for txt output
-        xl_var = BooleanVar()  # holds user selection for xlsx output
+        self.csv_var = BooleanVar() # holds user selection for csv output
+        self.txt_var = BooleanVar() # holds user selection for txt output
+        self.xl_var = BooleanVar()  # holds user selection for xlsx output
 
         top_dir_label = ttk.Label(self.top_frame, text="Specify Directory")
         top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.testing123)
@@ -109,9 +110,10 @@ class LenaUI:
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
         top_format_label = ttk.Label(self.top_frame, text="Output Format")        
-        top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.testing123, variable=csv_var,onvalue=1, offvalue=0)
-        top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.testing123, variable=txt_var,onvalue=1, offvalue=0)
-        top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.testing123, variable=xl_var,onvalue=1, offvalue=0)
+        top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.set_output_var, variable=self.csv_var,onvalue=1, offvalue=0)
+        self.csv_var.set(1) # set to csv default
+        top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.set_output_var, variable=self.txt_var,onvalue=1, offvalue=0)
+        top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.set_output_var, variable=self.xl_var,onvalue=1, offvalue=0)
         top_filler = ttk.Label(self.top_frame, text="      ")
         top_in_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_input_dir)    #Browse button for input directory //J
         top_out_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_output_dir)   #Browse button for output directory //J
@@ -141,17 +143,9 @@ class LenaUI:
         codes = ['MAN','MAF','FAN','FAF','CHNSP','CHNNSP', \
 			'CHF','CXN','CXF','NON','NOF','OLN','OLF','TVN', \
 			'TVF','SIL']
-        type_var = StringVar()
-        ab_a_var = StringVar()
-        ab_b_var = StringVar()
-        abc_a_var = StringVar()
-        abc_b_var = StringVar()
-        abc_c_var = StringVar()
-        pause_length_var = DoubleVar()
-        pause_var = BooleanVar()
         mid_type_label = ttk.Label(self.mid_frame, text='Type of Analysis')       
-        mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=type_var, value='ab')
-        mid_abc_btn = ttk.Radiobutton(self.mid_frame, text='( A ---> B ) ---> C', variable=type_var, value='abc')        
+        mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=self.sequence_type, value=AB)
+        mid_abc_btn = ttk.Radiobutton(self.mid_frame, text='( A ---> B ) ---> C', variable=self.sequence_type, value=ABC)        
         mid_filler_label = ttk.Label(self.mid_frame, text="     ")
         mid_conf_label = ttk.Label(self.mid_frame, text="Configure Analysis")
         mid_conf_ab_a_label = ttk.Label(self.mid_frame, text="A") 
@@ -159,24 +153,24 @@ class LenaUI:
         mid_conf_abc_a_label = ttk.Label(self.mid_frame, text="A") 
         mid_conf_abc_b_label = ttk.Label(self.mid_frame, text="B") 
         mid_conf_abc_c_label = ttk.Label(self.mid_frame, text="C") 
-        mid_ab_a_btn = ttk.Combobox(self.mid_frame, textvariable=ab_a_var, width=8)
+        mid_ab_a_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_a, width=8)
         mid_ab_a_btn['values'] = codes
-        mid_ab_b_btn = ttk.Combobox(self.mid_frame, textvariable=ab_b_var, width=8)
+        mid_ab_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
         mid_ab_b_btn['values'] = codes
-        mid_abc_a_btn = ttk.Combobox(self.mid_frame, textvariable=abc_a_var, width=8)
+        mid_abc_a_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_a, width=8)
         mid_abc_a_btn['values'] = codes
-        mid_abc_b_btn = ttk.Combobox(self.mid_frame, textvariable=abc_b_var, width=8)
+        mid_abc_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
         mid_abc_b_btn['values'] = codes
-        mid_abc_c_btn = ttk.Combobox(self.mid_frame, textvariable=abc_c_var, width=8)
+        mid_abc_c_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_c, width=8)
         mid_abc_c_btn['values'] = codes   
         mid_filler_label2 = ttk.Label(self.mid_frame, text="     ")
         mid_pause_label = ttk.Label(self.mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(self.mid_frame, text="     ")
-        mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=35.0, variable=pause_length_var)
-        mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(self,pause_length_var), width=1)
-        mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(self,pause_length_var), width=1)
-        mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=pause_length_var, width=3)
-        mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", command=self.testing123)
+        mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=35.0, variable=self.pause_duration)
+        mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(self), width=1)
+        mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(self), width=1)
+        mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=3)
+        mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", variable=self.rounding_enabled,onvalue=True, offvalue=False)
 
 
         # setup mid frame widgets
@@ -206,7 +200,7 @@ class LenaUI:
     def setup_btm_frame(self):
         # BOTTOM FRAME CONFIG
         # create bottom frame widgets
-        btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.testing123)
+        btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.run_seqanalysis)
         btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
         self.btm_text_window = Text(self.btm_frame, width=50, height=5)
         self.btm_text_window.config(state=DISABLED)
@@ -229,42 +223,38 @@ class LenaUI:
     def check_config(self):
         "This method checks if all seq_config values are set. Returns error message if any aren't set."
 
-        # Error messages stored here
-        error = ""
-
         # check input directory
-        if len(self.input_dir) < 1:
-            error += "Input directory not set! "
-        
+        if len(str(self.top_in_path.get())) < 2:
+            return "Input directory not set! "
+
         # check output directory
-        if len(self.output_dir) < 1:
-            error += "Output directory not set! "
-        
+        if len(str(self.top_out_path.get())) < 2:
+            return "Output directory not set! "
+
+        # check sequence_type
+        if str(self.sequence_type.get()) not in (AB, ABC):
+            return "Sequence Type not set! "
+
         # check var_a
-        if self.var_a is None:
-            error += "A is not set! "
+        if len(str(self.var_a.get())) < 2:
+            return "A is not set! "
 
         # check var_b
-        if self.var_b is None:
-            error += "B is not set! "
+        if len(str(self.var_b.get())) < 2:
+            return "B is not set! "
 
         # check var_c
-        if self.var_c is None:
-            error += "C is not set! "
-        
+        while (self.sequence_type.get() == ABC):
+            if len(str(self.var_c.get())) < 2:
+                return "C is not set! "
+
         # check output_format
         if len(self.output_format) == 0:
-            error += "Output format not set! "
+            return "Output format not set! "
         
-        # check sequence_type
-        if len(self.sequence_type) < 1:
-            error += "Sequence Type not set! "
+        
 
-        # check if any config values not set
-        if len(error) > 1:
-            return error
-        else:
-            return OK
+        return OK
 
     def set_config(self):
         "This method sets the self.seq_config variable - returns True if successful, False if unsuccessful"
@@ -272,21 +262,20 @@ class LenaUI:
         # check if config options set
         errorVal = self.check_config()
         if errorVal != OK:
-            # call method to print error to screen
-            # return error
+            self.write_to_window(errorVal)
             return False
 
         # all config options set, so fill self.seq_config
-        self.seq_config['batDir'] = self.input_dir
-        self.seq_config['A'] = self.var_a
-        self.seq_config['B'] = self.var_b
-        self.seq_config['C'] = self.var_c
+        self.seq_config['batDir'] = self.top_in_path.get()
+        self.seq_config['A'] = self.var_a.get()
+        self.seq_config['B'] = self.var_b.get()
+        self.seq_config['C'] = self.var_c.get()
         self.seq_config['outputContent'] = ""
-        self.seq_config['roundingEnabled'] = self.rounding_enabled
+        self.seq_config['roundingEnabled'] = self.rounding_enabled.get()
         self.seq_config['P'] = 'Pause'
         self.seq_config['outputDirPath'] = ""
-        self.seq_config['seqType'] = self.sequence_type
-        self.seq_config['PauseDur'] = self.pause_duration
+        self.seq_config['seqType'] = self.sequence_type.get()
+        self.seq_config['PauseDur'] = self.pause_duration.get()
 
         return True
 
@@ -297,6 +286,12 @@ class LenaUI:
         
         # call setconfig
         r = self.set_config()
+        if r != True:
+            return
+
+        print("Passed Tests!")
+        print(str(self.seq_config))
+        return
 
         test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
         test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
@@ -382,3 +377,27 @@ class LenaUI:
         self.btm_text_window.delete(1.0,END)
         self.btm_text_window.insert(END, self.output_msg)
         self.btm_text_window.config(state=DISABLED)
+
+    def set_output_var(self):
+        "This method sets the output var based on the user's selection"
+
+        if self.csv_var.get() == 1:
+            if ".csv" not in self.output_format:
+                self.output_format.append(".csv")
+        elif self.csv_var.get() == 0:
+            if ".csv" in self.output_format:
+                self.output_format.remove(".csv")
+
+        if self.xl_var.get() == 1:
+            if ".xlsx" not in self.output_format:
+                self.output_format.append(".xlsx")
+        elif self.xl_var.get() == 0:
+            if ".xlsx" in self.output_format:
+                self.output_format.remove(".xlsx")
+        
+        if self.txt_var.get() == 1:
+            if ".txt" not in self.output_format:
+                self.output_format.append(".txt")
+        elif self.txt_var.get() == 0:
+            if ".txt" in self.output_format:
+                self.output_format.remove(".txt")
