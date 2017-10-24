@@ -123,9 +123,6 @@ class LenaUI:
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
         top_format_label = ttk.Label(self.top_frame, text="Output Format")        
-        top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.set_csv_output(csv_var), variable=csv_var,onvalue=1, offvalue=0)
-        top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.set_txt_output(txt_var), variable=txt_var,onvalue=1, offvalue=0)
-        top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.set_xl_output(xl_var), variable=xl_var,onvalue=1, offvalue=0)
         top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.set_output_var, variable=self.csv_var,onvalue=1, offvalue=0)
         self.csv_var.set(1) # set to csv default
         top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.set_output_var, variable=self.txt_var,onvalue=1, offvalue=0)
@@ -384,7 +381,7 @@ class LenaUI:
 
         # run analysis on all found .its files
         for k,v in batch.items.iteritems():
-        self.write_to_window("Performing analysis!")
+            self.write_to_window("Performing analysis!")
         for k,v in self.its_file_dict.items.iteritems():
             
             sa = SeqAnalysis(self.seq_config, k, v)
@@ -489,4 +486,3 @@ class LenaUI:
         elif self.txt_var.get() == 0:
             if ".txt" in self.output_format:
                 self.output_format.remove(".txt")
-
