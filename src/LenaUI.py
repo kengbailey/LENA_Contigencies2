@@ -105,7 +105,7 @@ class LenaUI:
         self.xl_var = BooleanVar()  # holds user selection for xlsx output
 
         top_dir_label = ttk.Label(self.top_frame, text="Specify Directory")
-        top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.testing123)
+        top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.reset_config)
         top_load_btn = ttk.Button(self.top_frame, text="LOAD", command=self.testing123)
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
@@ -136,6 +136,8 @@ class LenaUI:
         top_txt_btn.grid(row=6, column=1)
         top_xl_btn.grid(row=6, column=2)
         top_load_btn.grid(row=0, column=2)
+    
+
 
     def setup_mid_frame(self):
         # MID FRAME CONFIG
@@ -143,16 +145,7 @@ class LenaUI:
         codes = ['MAN','MAF','FAN','FAF','CHNSP','CHNNSP', \
 			'CHF','CXN','CXF','NON','NOF','OLN','OLF','TVN', \
 			'TVF','SIL']
-        mid_type_label = ttk.Label(self.mid_frame, text='Type of Analysis')       
-        mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=self.sequence_type, value=AB)
-        mid_abc_btn = ttk.Radiobutton(self.mid_frame, text='( A ---> B ) ---> C', variable=self.sequence_type, value=ABC)        
-        mid_filler_label = ttk.Label(self.mid_frame, text="     ")
-        mid_conf_label = ttk.Label(self.mid_frame, text="Configure Analysis")
-        mid_conf_ab_a_label = ttk.Label(self.mid_frame, text="A") 
-        mid_conf_ab_b_label = ttk.Label(self.mid_frame, text="B") 
-        mid_conf_abc_a_label = ttk.Label(self.mid_frame, text="A") 
-        mid_conf_abc_b_label = ttk.Label(self.mid_frame, text="B") 
-        mid_conf_abc_c_label = ttk.Label(self.mid_frame, text="C") 
+        
         mid_ab_a_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_a, width=8)
         mid_ab_a_btn['values'] = codes
         mid_ab_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
@@ -162,7 +155,49 @@ class LenaUI:
         mid_abc_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
         mid_abc_b_btn['values'] = codes
         mid_abc_c_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_c, width=8)
-        mid_abc_c_btn['values'] = codes   
+        mid_abc_c_btn['values'] = codes  
+
+        #disabled AB analysis drop down menus
+        #enables ABC analysis drop down menus
+        def disableAB():
+            mid_ab_a_btn.configure(state="disable")
+            mid_ab_a_btn.update()
+            mid_ab_b_btn.configure(state="disable")
+            mid_ab_b_btn.update()
+
+            mid_abc_a_btn.configure(state="normal")
+            mid_abc_a_btn.update()
+            mid_abc_b_btn.configure(state="normal")
+            mid_abc_b_btn.update()
+            mid_abc_c_btn.configure(state="normal")
+            mid_abc_c_btn.update()
+
+        #disabled ABC analysis drop down menus
+        #enables AB analysis drop down menus
+        def disableABC():
+            mid_abc_a_btn.configure(state="disable")
+            mid_abc_a_btn.update()
+            mid_abc_b_btn.configure(state="disable")
+            mid_abc_b_btn.update()
+            mid_abc_c_btn.configure(state="disable")
+            mid_abc_c_btn.update()
+
+            mid_ab_a_btn.configure(state="normal")
+            mid_ab_a_btn.update()
+            mid_ab_b_btn.configure(state="normal")
+            mid_ab_b_btn.update()
+
+        mid_type_label = ttk.Label(self.mid_frame, text='Type of Analysis')       
+        mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=self.sequence_type, value=AB, command = disableABC)
+        mid_abc_btn = ttk.Radiobutton(self.mid_frame, text='( A ---> B ) ---> C', variable=self.sequence_type, value=ABC, command = disableAB)        
+        mid_filler_label = ttk.Label(self.mid_frame, text="     ")
+        mid_conf_label = ttk.Label(self.mid_frame, text="Configure Analysis")
+        mid_conf_ab_a_label = ttk.Label(self.mid_frame, text="A") 
+        mid_conf_ab_b_label = ttk.Label(self.mid_frame, text="B") 
+        mid_conf_abc_a_label = ttk.Label(self.mid_frame, text="A") 
+        mid_conf_abc_b_label = ttk.Label(self.mid_frame, text="B") 
+        mid_conf_abc_c_label = ttk.Label(self.mid_frame, text="C") 
+ 
         mid_filler_label2 = ttk.Label(self.mid_frame, text="     ")
         mid_pause_label = ttk.Label(self.mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(self.mid_frame, text="     ")
@@ -336,7 +371,13 @@ class LenaUI:
 
     def reset_config(self):
         "This method resets the all program options"
-    
+        self.input_dir = StringVar()
+        self.output_dir = StringVar()
+        self.top_in_path.delete(0, 'end')
+        self.top_in_path.update()
+        self.top_out_path.delete(0, 'end')
+        self.top_out_path.update()
+        
     def save_config(self):
         "This method allows the user to save the program's current configuration"
     
