@@ -19,9 +19,6 @@ import threading
 import time
 
 MAC = 'Darwin'
-OK = 'ok'
-AB = 'A_B'
-ABC = 'AB_C'
 
 class LenaUI:
 
@@ -34,16 +31,16 @@ class LenaUI:
 
         # Class Attributes
         self.its_file_dict = {} # k:ID v:path/to/file
-        self.seq_config = {}
         self.input_dir = StringVar()
         self.output_dir = StringVar()
         self.pause_duration = None
-        self.rounding_enabled = False
+        self.rounding_enabled = None
         self.sequence_type = None
         self.var_a = None
         self.var_b = None
         self.var_c = None
         self.output_format = []
+        self.seq_config = {}
         
 
         # Create main frames
@@ -92,7 +89,7 @@ class LenaUI:
             pause_length_var.set(pause_length_var.get()+0.1)
 
     def change_pause_lengthD(self, event, pause_length_var):
-        if pause_length_var.get() >= 0.1:
+        if pause_length_var.get() >= 1.0:
             pause_length_var.set(pause_length_var.get()-0.1)
 
     def setup_top_frame(self):
@@ -101,6 +98,9 @@ class LenaUI:
         csv_var = BooleanVar() # holds user selection for csv output
         txt_var = BooleanVar() # holds user selection for txt output
         xl_var = BooleanVar()  # holds user selection for xlsx output
+        
+       
+
 
         top_dir_label = ttk.Label(self.top_frame, text="Specify Directory")
         top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.testing123)
@@ -108,9 +108,9 @@ class LenaUI:
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
         top_format_label = ttk.Label(self.top_frame, text="Output Format")        
-        top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.testing123, variable=csv_var,onvalue=1, offvalue=0)
-        top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.testing123, variable=txt_var,onvalue=1, offvalue=0)
-        top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.testing123, variable=xl_var,onvalue=1, offvalue=0)
+        top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.set_csv_output(csv_var), variable=csv_var,onvalue=1, offvalue=0)
+        top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.set_txt_output(txt_var), variable=txt_var,onvalue=1, offvalue=0)
+        top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.set_xl_output(xl_var), variable=xl_var,onvalue=1, offvalue=0)
         top_filler = ttk.Label(self.top_frame, text="      ")
         top_in_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_input_dir)    #Browse button for input directory //J
         top_out_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_output_dir)   #Browse button for output directory //J
@@ -133,6 +133,7 @@ class LenaUI:
         top_txt_btn.grid(row=6, column=1)
         top_xl_btn.grid(row=6, column=2)
         top_load_btn.grid(row=0, column=2)
+
 
     def setup_mid_frame(self):
         # MID FRAME CONFIG
@@ -214,6 +215,8 @@ class LenaUI:
         btm_progress_bar.grid(row=0, column=1)
         btm_text_window.grid(row=1, column=0, columnspan=2)
 
+        
+
 
     def select_input_dir(self):
         self.input_dir.set(tkFileDialog.askdirectory())
@@ -223,82 +226,33 @@ class LenaUI:
 
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
-        self.its_file_dict = Batch(self.input_dir)
-
-    def check_config(self):
-        "This method checks if all seq_config values are set. Returns error message if any aren't set."
-
-        # Error messages stored here
-        error = ""
-
-        # check input directory
-        if len(self.input_dir) < 1:
-            error += "Input directory not set! "
-        
-        # check output directory
-        if len(self.output_dir) < 1:
-            error += "Output directory not set! "
-        
-        # check var_a
-        if self.var_a is None:
-            error += "A is not set! "
-
-        # check var_b
-        if self.var_b is None:
-            error += "B is not set! "
-
-        # check var_c
-        if self.var_c is None:
-            error += "C is not set! "
-        
-        # check output_format
-        if len(self.output_format) == 0:
-            error += "Output format not set! "
-        
-        # check sequence_type
-        if len(self.sequence_type) < 1:
-            error += "Sequence Type not set! "
-
-        # check if any config values not set
-        if len(error) > 1:
-            return error
-        else:
-            return OK
 
     def set_config(self):
-        "This method sets the self.seq_config variable - returns True if successful, False if unsuccessful"
 
-        # check if config options set
-        errorVal = self.check_config()
-        if errorVal != OK:
-            # call method to print error to screen
-            # return error
-            return False
+        # check and set self.var_a
+        if self.var_a != None:
+            errorVal = "Error! Val_a not set!"
+        else:
+            self.seq_config['A'] = self.var_a
 
-        # all config options set, so fill self.seq_config
-        self.seq_config['batDir'] = self.input_dir
-        self.seq_config['A'] = self.var_a
-        self.seq_config['B'] = self.var_b
-        self.seq_config['C'] = self.var_c
-        self.seq_config['outputContent'] = ""
-        self.seq_config['roundingEnabled'] = self.rounding_enabled
-        self.seq_config['P'] = 'Pause'
-        self.seq_config['outputDirPath'] = ""
-        self.seq_config['seqType'] = self.sequence_type
-        self.seq_config['PauseDur'] = self.pause_duration
-
-        return True
-
-        
+        # check if any errors occured
+        if errorVal != "":
+            return errorVal
+        else:
+            return ""
 
     def run_seqanalysis(self):
         "This method performs the sequence analysis on all .its files"
         
         # call setconfig
-        r = self.set_config()
+        r = self.seq_config
 
         test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
         test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
+
+        # get batch of its files
+        batch = Batch(test_batDir)
+        print(len(batch.items))
 
         # threading vars
         results = []
@@ -309,7 +263,7 @@ class LenaUI:
         t = time.time()
 
         # run analysis on all found .its files
-        for k,v in self.its_file_dict.items.iteritems():
+        for k,v in batch.items.iteritems():
             
             sa = SeqAnalysis(test_config, k, v)
             proc = threading.Thread(target=sa.Perform, args=(str(v[0]), results, tLock))
@@ -326,15 +280,7 @@ class LenaUI:
         print(str(results))
 
         # output file
-        if 'csv' in self.output_format:
-            self.output_csv(results)
-        if 'txt' in self.output_format:
-            self.ouput_txt(results)
-        if 'xlsx' in self.output_format:
-            self.output_xlsx(results)
-        
-        # send success message to window
-
+        # based on self.
 
     def load_config(self):
         "This method loads a config file for the program"
@@ -348,17 +294,49 @@ class LenaUI:
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
 
-    def ouput_txt(self, results):
+    def ouput_txt(self):
         "This method outputs the analysis results to a .txt file"
 
-    def output_csv(self, results):
+    def output_csv(self):
         "This method outputs the analysis results to a .csv file"
 
-    def output_xlsx(self, results):
+    def output_xlsx(self):
         "This method outputs the analysis results to a .xlsx file"
 
-    def set_config_from_file(self, config):
-        "This method applies the config variable passed to it to the program"
 
-    def reset_all_widgets(self):
-        "This method resets all widgets"
+# appends csv to output_format list if bool_value == 1 removes otherwise
+    def set_csv_output(self,bool_value): 
+        if bool_value.get() == 1:
+            self.output_format.append("csv")              
+        elif  bool_value.get() == 0:
+            if "csv" in self.output_format:
+                self.output_format.remove("csv")
+        else:
+            pass
+                          
+
+# appends txt to output_format list if bool_value == 1 removes otherwise
+    def set_txt_output(self,bool_value): 
+        if bool_value.get() == 1:
+            self.output_format.append("txt")              
+        elif  bool_value.get() == 0:
+            if "txt" in self.output_format:
+                self.output_format.remove("txt")
+        else:
+            pass
+        
+
+# appends xl to output_format list if bool_value == 1 removes otherwise      
+    def set_xl_output(self,bool_value):
+        if bool_value.get() == 1:
+            self.output_format.append("xl")              
+        elif  bool_value.get() == 0:
+            if "xl" in self.output_format:
+                self.output_format.remove("xl")          
+        else:
+            pass
+    
+    
+    
+
+    
