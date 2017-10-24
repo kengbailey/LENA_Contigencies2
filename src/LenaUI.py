@@ -490,37 +490,3 @@ class LenaUI:
             if ".txt" in self.output_format:
                 self.output_format.remove(".txt")
 
-"""
-# appends csv to output_format list if bool_value == 1 removes otherwise
-    def set_csv_output(self,bool_value): 
-        if bool_value.get() == 1:
-            self.output_format.append("csv")              
-        elif  bool_value.get() == 0:
-            if "csv" in self.output_format:
-                self.output_format.remove("csv")
-        else:
-            pass
-                          
-
-# appends txt to output_format list if bool_value == 1 removes otherwise
-    def set_txt_output(self,bool_value): 
-        if bool_value.get() == 1:
-            self.output_format.append("txt")              
-        elif  bool_value.get() == 0:
-            if "txt" in self.output_format:
-                self.output_format.remove("txt")
-        else:
-            pass
-        
-
-# appends xl to output_format list if bool_value == 1 removes otherwise      
-    def set_xl_output(self,bool_value):
-        if bool_value.get() == 1:
-            self.output_format.append("xl")              
-        elif  bool_value.get() == 0:
-            if "xl" in self.output_format:
-                self.output_format.remove("xl")          
-        else:
-            pass
-    
-"""   
