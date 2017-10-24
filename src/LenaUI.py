@@ -33,7 +33,6 @@ class LenaUI:
         self.its_file_dict = {} # k:ID v:path/to/file
         self.input_dir = StringVar()
         self.output_dir = StringVar()
-<<<<<<< HEAD
         self.pause_duration = None
         self.rounding_enabled = None
         self.sequence_type = None
@@ -42,7 +41,6 @@ class LenaUI:
         self.var_c = None
         self.output_format = []
         self.seq_config = {}
-=======
         self.pause_duration = DoubleVar()
         self.rounding_enabled = BooleanVar()
         self.sequence_type = StringVar()
@@ -53,7 +51,6 @@ class LenaUI:
         self.output_format.append(".csv") # set to csv default
         self.output_msg = ""
         self.output_msg_counter = 0
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
         
 
         # Create main frames
@@ -100,31 +97,25 @@ class LenaUI:
         if self.pause_duration.get() < 35.0:
             self.pause_duration.set(self.pause_duration.get()+0.1)
 
-<<<<<<< HEAD
     def change_pause_lengthD(self, event, pause_length_var):
         if pause_length_var.get() >= 1.0:
             pause_length_var.set(pause_length_var.get()-0.1)
-=======
     def change_pause_lengthD(self, event):
         if self.pause_duration.get() >= 0.1:
             self.pause_duration.set(self.pause_duration.get()-0.1)
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
 
     def setup_top_frame(self):
         # TOP FRAME CONFIG
         # Create top frame widgets
-<<<<<<< HEAD
         csv_var = BooleanVar() # holds user selection for csv output
         txt_var = BooleanVar() # holds user selection for txt output
         xl_var = BooleanVar()  # holds user selection for xlsx output
         
        
 
-=======
         self.csv_var = BooleanVar() # holds user selection for csv output
         self.txt_var = BooleanVar() # holds user selection for txt output
         self.xl_var = BooleanVar()  # holds user selection for xlsx output
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
 
         top_dir_label = ttk.Label(self.top_frame, text="Specify Directory")
         top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.reset_config)
@@ -132,16 +123,13 @@ class LenaUI:
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
         top_format_label = ttk.Label(self.top_frame, text="Output Format")        
-<<<<<<< HEAD
         top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.set_csv_output(csv_var), variable=csv_var,onvalue=1, offvalue=0)
         top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.set_txt_output(txt_var), variable=txt_var,onvalue=1, offvalue=0)
         top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.set_xl_output(xl_var), variable=xl_var,onvalue=1, offvalue=0)
-=======
         top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.set_output_var, variable=self.csv_var,onvalue=1, offvalue=0)
         self.csv_var.set(1) # set to csv default
         top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.set_output_var, variable=self.txt_var,onvalue=1, offvalue=0)
         top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.set_output_var, variable=self.xl_var,onvalue=1, offvalue=0)
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
         top_filler = ttk.Label(self.top_frame, text="      ")
         top_in_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_input_dir)    #Browse button for input directory //J
         top_out_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_output_dir)   #Browse button for output directory //J
@@ -270,18 +258,15 @@ class LenaUI:
         self.btm_text_window.config(state=DISABLED)
 
         # arrange bottom frame widgets
-<<<<<<< HEAD
         btm_submit_btn.grid(row=0, column=0)
         btm_progress_bar.grid(row=0, column=1)
         btm_text_window.grid(row=1, column=0, columnspan=2)
 
         
 
-=======
         btm_submit_btn.grid(row=0, column=1)
         btm_progress_bar.grid(row=0, column=0)
         self.btm_text_window.grid(row=1, column=0, columnspan=2)
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
 
     def select_input_dir(self):
         self.input_dir.set(tkFileDialog.askdirectory())
@@ -291,7 +276,6 @@ class LenaUI:
 
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
-<<<<<<< HEAD
 
     def set_config(self):
 
@@ -306,7 +290,6 @@ class LenaUI:
             return errorVal
         else:
             return ""
-=======
         self.its_file_dict = Batch(self.input_dir.get())
 
     def check_config(self):
@@ -371,34 +354,27 @@ class LenaUI:
         return True
 
         
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
 
     def run_seqanalysis(self):
         "This method performs the sequence analysis on all .its files"
         
         # call setconfig
-<<<<<<< HEAD
         r = self.seq_config
-=======
         r = self.set_config()
         if r != True:
             return
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
 
         #test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
         #test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
 
-<<<<<<< HEAD
         # get batch of its files
         batch = Batch(test_batDir)
         print(len(batch.items))
 
-=======
         # testing
         #self.input_dir.set("/Users/kennethbailey/school/LENA_Contigencies2")
         #testConfig = {'batDir': '/Users/kennethbailey/school/LENA_Contigencies2', 'A': 'FAF', 'C': '', 'B': 'FAF', 'roundingEnabled': 'True', 'P': 'Pause', 'outputContent': '', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '2.7'}
         
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
         # threading vars
         results = []
         tLock = threading.Lock()
@@ -407,12 +383,9 @@ class LenaUI:
         t = time.time()
 
         # run analysis on all found .its files
-<<<<<<< HEAD
         for k,v in batch.items.iteritems():
-=======
         self.write_to_window("Performing analysis!")
         for k,v in self.its_file_dict.items.iteritems():
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
             
             sa = SeqAnalysis(self.seq_config, k, v)
             proc = threading.Thread(target=sa.Perform, args=(str(v[0]), results, tLock))
@@ -426,9 +399,7 @@ class LenaUI:
         done = time.time()-t
         
         # output file
-<<<<<<< HEAD
         # based on self.
-=======
         if 'csv' in self.output_format:
             self.output_csv(results)
         if 'txt' in self.output_format:
@@ -438,7 +409,6 @@ class LenaUI:
         
         # send success message to window
         self.write_to_window("Successfully Sequence Analysis! Files processed in {} seconds".format(round(done, 2)))
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
 
     def load_config(self):
         "This method loads a config file for the program"
@@ -460,7 +430,7 @@ class LenaUI:
 
     def ouput_txt(self):
         "This method outputs the analysis results to a .txt file"
-        pass
+
 
     def output_csv(self):
         "This method outputs the analysis results to a .csv file"
@@ -470,45 +440,10 @@ class LenaUI:
         "This method outputs the analysis results to a .xlsx file"
         pass
 
-
-<<<<<<< HEAD
-# appends csv to output_format list if bool_value == 1 removes otherwise
-    def set_csv_output(self,bool_value): 
-        if bool_value.get() == 1:
-            self.output_format.append("csv")              
-        elif  bool_value.get() == 0:
-            if "csv" in self.output_format:
-                self.output_format.remove("csv")
-        else:
-            pass
-                          
-
-# appends txt to output_format list if bool_value == 1 removes otherwise
-    def set_txt_output(self,bool_value): 
-        if bool_value.get() == 1:
-            self.output_format.append("txt")              
-        elif  bool_value.get() == 0:
-            if "txt" in self.output_format:
-                self.output_format.remove("txt")
-        else:
-            pass
-        
-
-# appends xl to output_format list if bool_value == 1 removes otherwise      
-    def set_xl_output(self,bool_value):
-        if bool_value.get() == 1:
-            self.output_format.append("xl")              
-        elif  bool_value.get() == 0:
-            if "xl" in self.output_format:
-                self.output_format.remove("xl")          
-        else:
-            pass
-    
-    
+ 
     
 
     
-=======
     def reset_all_widgets(self):
         "This method resets all widgets"
 
@@ -554,4 +489,38 @@ class LenaUI:
         elif self.txt_var.get() == 0:
             if ".txt" in self.output_format:
                 self.output_format.remove(".txt")
->>>>>>> 978de45744f286e0c350388aa37abab05c948ec0
+
+"""
+# appends csv to output_format list if bool_value == 1 removes otherwise
+    def set_csv_output(self,bool_value): 
+        if bool_value.get() == 1:
+            self.output_format.append("csv")              
+        elif  bool_value.get() == 0:
+            if "csv" in self.output_format:
+                self.output_format.remove("csv")
+        else:
+            pass
+                          
+
+# appends txt to output_format list if bool_value == 1 removes otherwise
+    def set_txt_output(self,bool_value): 
+        if bool_value.get() == 1:
+            self.output_format.append("txt")              
+        elif  bool_value.get() == 0:
+            if "txt" in self.output_format:
+                self.output_format.remove("txt")
+        else:
+            pass
+        
+
+# appends xl to output_format list if bool_value == 1 removes otherwise      
+    def set_xl_output(self,bool_value):
+        if bool_value.get() == 1:
+            self.output_format.append("xl")              
+        elif  bool_value.get() == 0:
+            if "xl" in self.output_format:
+                self.output_format.remove("xl")          
+        else:
+            pass
+    
+"""   
