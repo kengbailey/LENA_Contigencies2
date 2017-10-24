@@ -204,7 +204,7 @@ class LenaUI:
         mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=35.0, variable=self.pause_duration)
         mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(self), width=1)
         mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(self), width=1)
-        mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=3)
+        mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=6)
         mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", variable=self.rounding_enabled,onvalue=True, offvalue=False)
 
 
