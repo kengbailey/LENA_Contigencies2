@@ -36,12 +36,6 @@ class LenaUI:
         self.its_file_dict = {} # k:ID v:path/to/file
         self.input_dir = StringVar()
         self.output_dir = StringVar()
-        self.pause_duration = None
-        self.rounding_enabled = None
-        self.sequence_type = None
-        self.var_a = None
-        self.var_b = None
-        self.var_c = None
         self.output_format = []
         self.seq_config = {}
         self.pause_duration = DoubleVar()
