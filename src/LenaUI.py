@@ -19,6 +19,9 @@ import threading
 import time
 
 MAC = 'Darwin'
+AB = 'A_B'
+ABC = 'AB_C'
+OK = 'ok'
 
 class LenaUI:
 
@@ -257,7 +260,7 @@ class LenaUI:
         # arrange bottom frame widgets
         btm_submit_btn.grid(row=0, column=0)
         btm_progress_bar.grid(row=0, column=1)
-        btm_text_window.grid(row=1, column=0, columnspan=2)
+        self.btm_text_window.grid(row=1, column=0, columnspan=2)
 
         
 
@@ -273,6 +276,7 @@ class LenaUI:
 
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
+        self.its_file_dict = Batch(self.input_dir.get())
 
     def set_config(self):
 
@@ -364,10 +368,6 @@ class LenaUI:
         #test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
         #test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
 
-        # get batch of its files
-        batch = Batch(test_batDir)
-        print(len(batch.items))
-
         # testing
         #self.input_dir.set("/Users/kennethbailey/school/LENA_Contigencies2")
         #testConfig = {'batDir': '/Users/kennethbailey/school/LENA_Contigencies2', 'A': 'FAF', 'C': '', 'B': 'FAF', 'roundingEnabled': 'True', 'P': 'Pause', 'outputContent': '', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '2.7'}
@@ -379,9 +379,8 @@ class LenaUI:
         self.get_its_files()
         t = time.time()
 
-        # run analysis on all found .its files
-        for k,v in batch.items.iteritems():
-            self.write_to_window("Performing analysis!")
+        # run analysis on all found .its files       
+        self.write_to_window("Performing analysis!")
         for k,v in self.its_file_dict.items.iteritems():
             
             sa = SeqAnalysis(self.seq_config, k, v)
