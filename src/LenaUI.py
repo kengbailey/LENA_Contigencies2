@@ -44,7 +44,6 @@ class LenaUI:
         self.var_a = StringVar()
         self.var_b = StringVar()
         self.var_c = StringVar()
-        self.output_format = []
         self.output_format.append(".csv") # set to csv default
         self.output_msg = ""
         self.output_msg_counter = 0
@@ -246,12 +245,6 @@ class LenaUI:
         self.btm_text_window.config(state=DISABLED)
 
         # arrange bottom frame widgets
-        btm_submit_btn.grid(row=0, column=0)
-        btm_progress_bar.grid(row=0, column=1)
-        self.btm_text_window.grid(row=1, column=0, columnspan=2)
-
-        
-
         btm_submit_btn.grid(row=0, column=1)
         btm_progress_bar.grid(row=0, column=0)
         self.btm_text_window.grid(row=1, column=0, columnspan=2)
@@ -400,7 +393,7 @@ class LenaUI:
 
     def ouput_txt(self):
         "This method outputs the analysis results to a .txt file"
-
+        pass
 
     def output_csv(self):
         "This method outputs the analysis results to a .csv file"
@@ -409,10 +402,6 @@ class LenaUI:
     def output_xlsx(self):
         "This method outputs the analysis results to a .xlsx file"
         pass
-
- 
-    
-
     
     def reset_all_widgets(self):
         "This method resets all widgets"
