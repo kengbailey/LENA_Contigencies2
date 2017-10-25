@@ -17,6 +17,7 @@ import os
 import platform
 import threading
 import time
+import xlsxwriter
 
 MAC = 'Darwin'
 AB = 'A_B'
@@ -313,7 +314,7 @@ class LenaUI:
         self.seq_config['outputContent'] = ""
         self.seq_config['roundingEnabled'] = str(self.rounding_enabled.get())
         self.seq_config['P'] = 'Pause'
-        self.seq_config['outputDirPath'] = ""
+        self.seq_config['outputDirPath'] = self.top_out_path.get()
         self.seq_config['seqType'] = self.sequence_type.get()
         self.seq_config['PauseDur'] = str(round(self.pause_duration.get(), 1))
 
@@ -417,10 +418,24 @@ class LenaUI:
     def output_xlsx(self, results):
         "This method outputs the analysis results to a .xlsx file"
         if '.xlsx' in self.output_format:
-            # output code 
-            print("Output in .xlsx")
-            pass
-        pass
+            # create workbook & add sheet
+            out_file = self.seq_config['outputDirPath'] +'//'+ 'test.xlsx'
+            workbook = xlsxwriter.Workbook(out_file)
+            worksheet = workbook.add_worksheet()
+
+            # start from first cell
+            row = 0
+            
+            # insert into worksheet
+            for line in results:
+                col = 0
+                for cell in str(line).split(","):
+                    worksheet.write(row, col, cell)
+                    col += 1
+                row += 1
+
+            # close file
+            workbook.close()
     
     def reset_all_widgets(self):
         "This method resets all widgets"
