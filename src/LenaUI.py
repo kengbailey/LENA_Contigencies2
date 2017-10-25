@@ -351,7 +351,6 @@ class LenaUI:
             
             sa = SeqAnalysis(self.seq_config, k, v)
             proc = threading.Thread(target=sa.Perform, args=(str(v[0]), results, tLock))
-            #proc.setDaemon(True)
             threads.append(proc)
             proc.start()
             
