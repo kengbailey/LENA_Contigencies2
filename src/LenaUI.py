@@ -22,6 +22,7 @@ MAC = 'Darwin'
 AB = 'A_B'
 ABC = 'AB_C'
 OK = 'ok'
+MAXTHREADS = 4
 
 class LenaUI:
 
@@ -293,7 +294,6 @@ class LenaUI:
         else:
             self.write_to_window("All config options are valid!")
         
-
         return OK
 
     def set_config(self):
@@ -320,8 +320,6 @@ class LenaUI:
         self.write_to_window("Config options assembled!")
         return True
 
-        
-
     def run_seqanalysis(self):
         "This method performs the sequence analysis on all .its files"
         
@@ -337,7 +335,7 @@ class LenaUI:
         # testing
         #self.input_dir.set("/Users/kennethbailey/school/LENA_Contigencies2")
         #testConfig = {'batDir': '/Users/kennethbailey/school/LENA_Contigencies2', 'A': 'FAF', 'C': '', 'B': 'FAF', 'roundingEnabled': 'True', 'P': 'Pause', 'outputContent': '', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '2.7'}
-        
+
         # threading vars
         results = []
         tLock = threading.Lock()
@@ -345,23 +343,30 @@ class LenaUI:
         self.get_its_files()
         t = time.time()
 
-        # run analysis on all found .its files       
-        self.write_to_window("Performing analysis!")
-        for k,v in self.its_file_dict.items.iteritems():
-            
-            sa = SeqAnalysis(self.seq_config, k, v)
-            proc = threading.Thread(target=sa.Perform, args=(str(v[0]), results, tLock))
-            threads.append(proc)
-            proc.start()
-            
-        # wait for threads to finish
-        for proc in threads:
-            proc.join()
-            print("thread done: "+proc.getName())
-        done = time.time()-t
+        # run sequence analysis on MAXTHREADS at a time
+        while len(self.its_file_dict.items) > 0:
+
+            # grab its file to process in this batch
+            tempDict = {}
+            for i in range(MAXTHREADS):
+                tempItem = self.its_file_dict.items.popitem()
+                tempDict.update({tempItem[0]:tempItem[1][0]})
+
+            # run analysis on all batch .its files       
+            self.write_to_window("Performing analysis!")
+            for k,v in tempDict.iteritems():
+                sa = SeqAnalysis(self.seq_config, k, v)
+                proc = threading.Thread(target=sa.Perform, args=(str(v), results, tLock))
+                threads.append(proc)
+                proc.start()
+                
+            # wait for threads to finish
+            for proc in threads:
+                proc.join()
+                print("thread done: "+proc.getName())
+            done = time.time()-t
         
         # output file in parallel
-        # based on self.
         threads = []
         csv_proc = threading.Thread(target=self.output_csv, args=(results,))
         txt_proc = threading.Thread(target=self.ouput_txt, args=(results,))
