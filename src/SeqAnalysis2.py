@@ -78,9 +78,16 @@ class EItemList:
 				# calculate number of pauses to insert
 				numP = 0
 				if self.round is True:
-					numP = int( (eT / P) + .5 )
+					try:
+						numP = int( (eT / P) + .5 )
+					except ZeroDivisionError:
+						numP = int( (0) + .5)
 				else:
-					numP = int( (eT / float(P)) )
+					try:
+						numP = int( (float(eT) / float(P)) )
+					except ZeroDivisionError:
+						numP = int((0) + .5)
+
 				for j in range(0,numP):
 					# insert pause
 					startTime = preEvT+(j*P)

@@ -144,9 +144,6 @@ class LenaUI:
         top_xl_btn.grid(row=6, column=2)
         top_load_btn.grid(row=0, column=2)
     
-
-
-
     def setup_mid_frame(self):
         # MID FRAME CONFIG
         # create mid frame widgets
@@ -269,21 +266,6 @@ class LenaUI:
         "This method looks creates a dict of all .its files found in the input directory"
         self.its_file_dict = Batch(self.input_dir.get())
 
-    def set_config(self):
-
-        # check and set self.var_a
-        if self.var_a != None:
-            errorVal = "Error! Val_a not set!"
-        else:
-            self.seq_config['A'] = self.var_a
-
-        # check if any errors occured
-        if errorVal != "":
-            return errorVal
-        else:
-            return ""
-        self.its_file_dict = Batch(self.input_dir.get())
-
     def check_config(self):
         "This method checks if all seq_config values are set. Returns error message if any aren't set."
 
@@ -376,6 +358,7 @@ class LenaUI:
             
             sa = SeqAnalysis(self.seq_config, k, v)
             proc = threading.Thread(target=sa.Perform, args=(str(v[0]), results, tLock))
+            #proc.setDaemon(True)
             threads.append(proc)
             proc.start()
             
