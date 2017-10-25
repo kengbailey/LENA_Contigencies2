@@ -361,14 +361,17 @@ class LenaUI:
             print("thread done: "+proc.getName())
         done = time.time()-t
         
-        # output file
+        # output file in parallel
         # based on self.
-        if 'csv' in self.output_format:
-            self.output_csv(results)
-        if 'txt' in self.output_format:
-            self.ouput_txt(results)
-        if 'xlsx' in self.output_format:
-            self.output_xlsx(results)
+        threads = []
+        csv_proc = threading.Thread(target=self.output_csv, args=(results,))
+        txt_proc = threading.Thread(target=self.ouput_txt, args=(results,))
+        xl_proc = threading.Thread(target=self.output_xlsx, args=(results,))
+        threads.extend([csv_proc, txt_proc, xl_proc])
+        for proc in threads:
+            proc.start()
+        for proc in threads:
+            proc.join()
         
         # send success message to window
         self.write_to_window("Successfully Sequence Analysis! Files processed in {} seconds".format(round(done, 2)))
@@ -391,16 +394,28 @@ class LenaUI:
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
 
-    def ouput_txt(self):
+    def ouput_txt(self, results):
         "This method outputs the analysis results to a .txt file"
+        if '.txt' in self.output_format:
+            # output code 
+            print("Output in .txt")
+            pass 
         pass
 
-    def output_csv(self):
+    def output_csv(self, results):
         "This method outputs the analysis results to a .csv file"
+        if '.csv' in self.output_format:
+            # output code
+            print("Output in .csv")
+            pass
         pass
 
-    def output_xlsx(self):
+    def output_xlsx(self, results):
         "This method outputs the analysis results to a .xlsx file"
+        if '.xlsx' in self.output_format:
+            # output code 
+            print("Output in .xlsx")
+            pass
         pass
     
     def reset_all_widgets(self):
