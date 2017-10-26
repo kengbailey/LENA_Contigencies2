@@ -411,6 +411,18 @@ class LenaUI:
         
     def save_config(self):
         "This method allows the user to save the program's current configuration"
+        if check_config() == OK:
+            config_save_file = tkFileDialog.asksaveasfile(mode='w', defaultextension=".leco")
+            config_save_file.write(str(self.top_in_path).get(), '\n')
+            config_save_file.write(str(self.top_out_path).get(), '\n')
+            config_save_file.write(str(self.sequence_type).get(), '\n')
+            config_save_file.write(str(self.var_a).get(), '\n')
+            config_save_file.write(str(self.var_b).get(), '\n')
+            if sequence_type.get() == ABC:
+                config_save_file.write(str(self.var_c).get(), '\n')
+            config_save_file.write(str(self.output_format.get(), '\n'))
+            self.write_to_window("Configuration successfully saved! ")
+            
     
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
