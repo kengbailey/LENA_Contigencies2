@@ -55,7 +55,7 @@ class LenaUI:
         
 
         # Create main frames
-        main_frame = ttk.Frame(root) # top, mid, btm frames embedded within this frame
+        main_frame = ttk.Frame(self.root) # top, mid, btm frames embedded within this frame
         self.top_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=300, height=150)
         self.mid_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=300, height=300)
         self.btm_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=300, height=100)
@@ -155,11 +155,7 @@ class LenaUI:
         codes = ['MAN','MAF','FAN','FAF','CHNSP','CHNNSP', \
 			'CHF','CXN','CXF','NON','NOF','OLN','OLF','TVN', \
 			'TVF','SIL']
-        
-        mid_ab_a_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_a, width=8)
-        mid_ab_a_btn['values'] = codes
-        mid_ab_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
-        mid_ab_b_btn['values'] = codes
+
         mid_abc_a_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_a, width=8)
         mid_abc_a_btn['values'] = codes
         mid_abc_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
@@ -167,43 +163,19 @@ class LenaUI:
         mid_abc_c_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_c, width=8)
         mid_abc_c_btn['values'] = codes  
 
-        #disabled AB analysis drop down menus
-        #enables ABC analysis drop down menus
-        def disableAB():
-            mid_ab_a_btn.configure(state="disable")
-            mid_ab_a_btn.update()
-            mid_ab_b_btn.configure(state="disable")
-            mid_ab_b_btn.update()
-
-            mid_abc_a_btn.configure(state="normal")
-            mid_abc_a_btn.update()
-            mid_abc_b_btn.configure(state="normal")
-            mid_abc_b_btn.update()
-            mid_abc_c_btn.configure(state="normal")
-            mid_abc_c_btn.update()
-
-        #disabled ABC analysis drop down menus
-        #enables AB analysis drop down menus
-        def disableABC():
-            mid_abc_a_btn.configure(state="disable")
-            mid_abc_a_btn.update()
-            mid_abc_b_btn.configure(state="disable")
-            mid_abc_b_btn.update()
+        def disable_c():
             mid_abc_c_btn.configure(state="disable")
             mid_abc_c_btn.update()
 
-            mid_ab_a_btn.configure(state="normal")
-            mid_ab_a_btn.update()
-            mid_ab_b_btn.configure(state="normal")
-            mid_ab_b_btn.update()
+        def enable_c():
+            mid_abc_c_btn.configure(state="normal")
+            mid_abc_c_btn.update()
 
         mid_type_label = ttk.Label(self.mid_frame, text='Type of Analysis')       
-        mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=self.sequence_type, value=AB, command = disableABC)
-        mid_abc_btn = ttk.Radiobutton(self.mid_frame, text='( A ---> B ) ---> C', variable=self.sequence_type, value=ABC, command = disableAB)        
+        mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=self.sequence_type, value=AB, command=disable_c)
+        mid_abc_btn = ttk.Radiobutton(self.mid_frame, text='( A ---> B ) ---> C', variable=self.sequence_type, value=ABC, command=enable_c)        
         mid_filler_label = ttk.Label(self.mid_frame, text="     ")
         mid_conf_label = ttk.Label(self.mid_frame, text="Configure Analysis")
-        mid_conf_ab_a_label = ttk.Label(self.mid_frame, text="A") 
-        mid_conf_ab_b_label = ttk.Label(self.mid_frame, text="B") 
         mid_conf_abc_a_label = ttk.Label(self.mid_frame, text="A") 
         mid_conf_abc_b_label = ttk.Label(self.mid_frame, text="B") 
         mid_conf_abc_c_label = ttk.Label(self.mid_frame, text="C") 
@@ -214,33 +186,27 @@ class LenaUI:
         mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=35.0, variable=self.pause_duration)
         mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(self), width=1)
         mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(self), width=1)
-        mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=6)
+        mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=4)
         mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", variable=self.rounding_enabled,onvalue=True, offvalue=False)
 
 
         # setup mid frame widgets
         mid_type_label.grid(row=0, column=0, columnspan=4)
-        mid_ab_btn.grid(row=2, column=0, columnspan=3, sticky = W)
-        mid_abc_btn.grid(row=8, column=0, columnspan=3, sticky = W)
-        #mid_conf_label.grid(row=1, column=1, columnspan=4)
-        mid_conf_ab_a_label.grid(row=4, column=0)
-        mid_conf_ab_b_label.grid(row=4, column=1)
-        mid_conf_abc_a_label.grid(row=9, column=0)
-        mid_conf_abc_b_label.grid(row=9, column=1)
-        mid_conf_abc_c_label.grid(row=9, column=2)
-        mid_ab_a_btn.grid(row=5, column=0)
-        mid_ab_b_btn.grid(row=5, column=1)
-        mid_abc_a_btn.grid(row=10, column=0)
-        mid_abc_b_btn.grid(row=10, column=1)
-        mid_filler_label2.grid(row=7, column=2)
-        mid_abc_c_btn.grid(row=10, column=2)
-        mid_filler_label3.grid(row=12, column=0, columnspan=3)
-        mid_pause_label.grid(row=13, column=0, columnspan=4)
-        mid_pause_slider.grid(row=14, column=1)
-        mid_pause_dn_btn.grid(row=14, column=2)
-        mid_pause_up_btn.grid(row=14, column=3)
-        mid_pause_entry.grid(row=14, column=0)
-        mid_pause_checkbox.grid(row=15, column=1)
+        mid_ab_btn.grid(row=1, column=0, columnspan=3, sticky = W)
+        mid_abc_btn.grid(row=2, column=0, columnspan=3, sticky = W)
+        mid_conf_abc_a_label.grid(row=3, column=0)
+        mid_conf_abc_b_label.grid(row=3, column=1)
+        mid_conf_abc_c_label.grid(row=3, column=2)
+        mid_abc_a_btn.grid(row=4, column=0)
+        mid_abc_b_btn.grid(row=4, column=1)
+        mid_abc_c_btn.grid(row=4, column=2)
+        mid_filler_label3.grid(row=5, column=0, columnspan=3)
+        mid_pause_label.grid(row=6, column=0, columnspan=4, pady=5)
+        mid_pause_entry.grid(row=7, column=0)
+        mid_pause_slider.grid(row=7, column=1, sticky=W)
+        mid_pause_dn_btn.grid(row=7, column=2, sticky=E)
+        mid_pause_up_btn.grid(row=7, column=3, sticky=W)
+        mid_pause_checkbox.grid(row=8, column=0, pady=4, columnspan=4)
 
     def setup_btm_frame(self):
         # BOTTOM FRAME CONFIG
