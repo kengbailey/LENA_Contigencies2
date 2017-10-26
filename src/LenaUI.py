@@ -92,7 +92,14 @@ class LenaUI:
             os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
     def testing123(self):
-        self.write_to_window(str(self.sequence_type.get()))
+
+        def dowork():
+            self.disable_widgets()
+            time.sleep(3)
+            self.enable_widgets()
+
+        thread = threading.Thread(target=dowork)
+        thread.start()
 
     def change_pause_legnthU(self, event):
         if self.pause_duration.get() < 35.0:
@@ -344,7 +351,10 @@ class LenaUI:
         thread.start()
 
     def sequence_analysis(self):
-
+        # disable window
+        self.write_to_window("Performing analysis!")
+        self.disable_widgets()
+            
         # threading vars
         results = []
         tLock = threading.Lock()
@@ -362,7 +372,6 @@ class LenaUI:
                 tempDict.update({tempItem[0]:tempItem[1][0]})
 
             # run analysis on all batch .its files       
-            self.write_to_window("Performing analysis!")
             for k,v in tempDict.iteritems():
                 sa = SeqAnalysis(self.seq_config, k, v)
                 proc = threading.Thread(target=sa.Perform, args=(str(v), results, tLock))
@@ -388,7 +397,8 @@ class LenaUI:
         
         # send success message to window
         self.write_to_window("Successfully Sequence Analysis! Files processed in {} seconds".format(round(done, 2)))
-
+        self.enable_widgets()
+        
     def load_config(self):
         "This method loads a config file for the program"
 
@@ -502,3 +512,29 @@ class LenaUI:
         elif self.txt_var.get() == 0:
             if ".txt" in self.output_format:
                 self.output_format.remove(".txt")
+    
+    def disable_widgets(self):
+        "This method disables top and mid widgets"
+        for child in self.top_frame.winfo_children():
+            try:
+                child.configure(state=DISABLED)
+            except:
+                pass
+        for child in self.mid_frame.winfo_children():
+            try:
+                child.configure(state=DISABLED)
+            except:
+                pass
+
+    def enable_widgets(self):
+        "This method enables top and mid widgets"
+        for child in self.top_frame.winfo_children():
+            try:
+                child.configure(state='enable')
+            except:
+                pass
+        for child in self.mid_frame.winfo_children():
+            try:
+                child.configure(state='enable')
+            except:
+                pass
