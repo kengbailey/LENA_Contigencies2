@@ -105,12 +105,6 @@ class LenaUI:
     def setup_top_frame(self):
         # TOP FRAME CONFIG
         # Create top frame widgets
-        csv_var = BooleanVar() # holds user selection for csv output
-        txt_var = BooleanVar() # holds user selection for txt output
-        xl_var = BooleanVar()  # holds user selection for xlsx output
-        
-       
-
         self.csv_var = BooleanVar() # holds user selection for csv output
         self.txt_var = BooleanVar() # holds user selection for txt output
         self.xl_var = BooleanVar()  # holds user selection for xlsx output
@@ -340,18 +334,16 @@ class LenaUI:
     def run_seqanalysis(self):
         "This method performs the sequence analysis on all .its files"
         
-        # call setconfig
-        r = self.seq_config
+        # check config
         r = self.set_config()
         if r != True:
-            return
+            return 
 
-        #test_config = {'batDir': '/home/syran/School/newLena/LENA_contingencies/its', 'A': 'FAF', 'C': '', 'outputContent': '', 'roundingEnabled': 'True', 'P': 'Pause', 'B': 'CXN', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '0.4'}
-        #test_batDir = '/home/syran/School/newLena/LENA_contingencies/its'
+        # start analysis 
+        thread = threading.Thread(target=self.sequence_analysis)
+        thread.start()
 
-        # testing
-        #self.input_dir.set("/Users/kennethbailey/school/LENA_Contigencies2")
-        #testConfig = {'batDir': '/Users/kennethbailey/school/LENA_Contigencies2', 'A': 'FAF', 'C': '', 'B': 'FAF', 'roundingEnabled': 'True', 'P': 'Pause', 'outputContent': '', 'outputDirPath': '', 'seqType': 'A_B', 'PauseDur': '2.7'}
+    def sequence_analysis(self):
 
         # threading vars
         results = []
