@@ -24,6 +24,9 @@ AB = 'A_B'
 ABC = 'AB_C'
 OK = 'ok'
 MAXTHREADS = 4
+codes = ['MAN','MAF','FAN','FAF','CHNSP','CHNNSP', \
+			'CHF','CXN','CXF','NON','NOF','OLN','OLF','TVN', \
+			'TVF','SIL']
 
 class LenaUI:
 
@@ -261,6 +264,15 @@ class LenaUI:
         "This method looks creates a dict of all .its files found in the input directory"
         self.its_file_dict = Batch(self.input_dir.get())
 
+    def check_code(self):
+        if self.var_a.get() not in codes:
+            return 'A'
+        if self.var_b.get() not in codes:
+            return 'B'
+        if self.sequence_type.get() == ABC:
+            if self.var_c.get() not in codes:
+                return 'C' 
+
     def check_config(self):
         "This method checks if all seq_config values are set. Returns error message if any aren't set."
 
@@ -288,6 +300,10 @@ class LenaUI:
         if (self.sequence_type.get() == ABC):
             if len(str(self.var_c.get())) < 2:
                 return "C is not set! "
+        
+        event = self.check_code()
+        if event in ['A','B','C']:
+            return (str(event)+" has invalid event")
 
         # check output_format
         if len(self.output_format) == 0:
@@ -436,7 +452,7 @@ class LenaUI:
 
             # close file
             workbook.close()
-    
+
     def reset_all_widgets(self):
         "This method resets all widgets"
 
