@@ -18,6 +18,7 @@ import platform
 import threading
 import time
 import xlsxwriter
+import ast
 
 MAC = 'Darwin'
 AB = 'A_B'
@@ -119,6 +120,7 @@ class LenaUI:
         top_dir_label = ttk.Label(self.top_frame, text="Specify Directory")
         top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.reset_config)
         top_load_btn = ttk.Button(self.top_frame, text="LOAD", command=self.testing123)
+        top_save_btn = ttk.Button(self.top_frame, text="SAVE", command=self.save_config)
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
         top_format_label = ttk.Label(self.top_frame, text="Output Format")        
@@ -148,6 +150,7 @@ class LenaUI:
         top_txt_btn.grid(row=6, column=1)
         top_xl_btn.grid(row=6, column=2)
         top_load_btn.grid(row=0, column=2)
+        top_save_btn.grid(row=0, column=1)
     
     def setup_mid_frame(self):
         # MID FRAME CONFIG
@@ -379,16 +382,9 @@ class LenaUI:
         
     def save_config(self):
         "This method allows the user to save the program's current configuration"
-        if check_config() == OK:
+        if self.check_config() == OK:
             config_save_file = tkFileDialog.asksaveasfile(mode='w', defaultextension=".leco")
-            config_save_file.write(str(self.top_in_path).get(), '\n')
-            config_save_file.write(str(self.top_out_path).get(), '\n')
-            config_save_file.write(str(self.sequence_type).get(), '\n')
-            config_save_file.write(str(self.var_a).get(), '\n')
-            config_save_file.write(str(self.var_b).get(), '\n')
-            if sequence_type.get() == ABC:
-                config_save_file.write(str(self.var_c).get(), '\n')
-            config_save_file.write(str(self.output_format.get(), '\n'))
+            config_save_file.write(str(ast.literal_eval(self.seq_config)))
             self.write_to_window("Configuration successfully saved! ")
             
     
