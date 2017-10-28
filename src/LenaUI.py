@@ -383,8 +383,10 @@ class LenaUI:
     def save_config(self):
         "This method allows the user to save the program's current configuration"
         if self.check_config() == OK:
+            self.set_config()
             config_save_file = tkFileDialog.asksaveasfile(mode='w', defaultextension=".leco")
-            config_save_file.write(str(ast.literal_eval(self.seq_config)))
+            seq_config_string = str(self.seq_config)
+            config_save_file.write(seq_config_string)
             self.write_to_window("Configuration successfully saved! ")
             
     
