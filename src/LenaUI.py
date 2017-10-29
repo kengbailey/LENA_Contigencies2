@@ -375,10 +375,19 @@ class LenaUI:
         "This method resets the all program options"
         self.input_dir = StringVar()
         self.output_dir = StringVar()
-        self.top_in_path.delete(0, 'end')
-        self.top_in_path.update()
-        self.top_out_path.delete(0, 'end')
-        self.top_out_path.update()
+        self.sequence_type = StringVar()
+        self.var_a = StringVar()
+        self.var_b = StringVar()
+        self.var_c = StringVar()
+        self.pause_duration = DoubleVar()
+        self.top_in_path.delete(0,END)
+        self.top_out_path.delete(0,END)
+        self.mid_ab_btn.deselect()
+        self.mid_abc_btn.deselect()
+        self.mid_abc_a_btn.delete(0,END)
+        self.mid_abc_b_btn.delete(0,END)
+        self.mid_abc_c_btn.delete(0,END)
+        self.mid_pause_entry.delete(0,END)
         
     def save_config(self):
         "This method allows the user to save the program's current configuration"
