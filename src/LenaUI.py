@@ -19,6 +19,7 @@ import threading
 import time
 import xlsxwriter
 import ast
+import tkMessageBox
 
 MAC = 'Darwin'
 AB = 'A_B'
@@ -72,7 +73,7 @@ class LenaUI:
         
         # help menu
         help_menu = Menu(menubar) # create "Help" menu item 
-        help_menu.add_command(label="Instructions", command=self.testing123) # add a command to "Help" menu item
+        help_menu.add_command(label="Instructions", command=self.load_instruction_window) # add a command to "Help" menu item
         menubar.add_cascade(label="Help", menu=help_menu) # attach "Help" menu item to helpbar
 
         # setup main frames to grid
@@ -401,6 +402,8 @@ class LenaUI:
     
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
+        instruction_var = self.list_instructions() 
+        tkMessageBox.showinfo("Istructions",instruction_var)
 
     def ouput_txt(self, results):
         "This method outputs the analysis results to a .txt file"
@@ -511,3 +514,11 @@ class LenaUI:
                 child.configure(state='enable')
             except:
                 pass
+    
+    def list_instructions(self):
+        instruction_var = "1) SAVE:  Saves all the data currently in all fields.\n"
+        instruction_var += "2) LOAD:  Loads the data last saved in all fields.\n"
+        instruction_var += "3) RESET:  Empties all fields\n"
+        instruction_var += "4) Input:  Browse to the directory that contains all files for analysis.\n"
+        instruction_var += "5) Output:  Browse to the desired directory for the output file."
+        return instruction_var
