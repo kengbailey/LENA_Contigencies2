@@ -104,10 +104,12 @@ class LenaUI:
         thread.start()
 
     def change_pause_legnthU(self, event):
+        "This method increases pause duration"
         if self.pause_duration.get() < 35.0:
             self.pause_duration.set(self.pause_duration.get()+0.1)
 
     def change_pause_lengthD(self, event):
+        "This method decreases pause duration"
         if self.pause_duration.get() >= 0.1:
             self.pause_duration.set(self.pause_duration.get()-0.1)
 
@@ -404,8 +406,7 @@ class LenaUI:
     
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
-        instruction_var = self.list_instructions() 
-        tkMessageBox.showinfo("Istructions",instruction_var)
+        tkMessageBox.showinfo("Istructions",self.list_instructions())
 
     def ouput_txt(self, results):
         "This method outputs the analysis results to a .txt file"
@@ -518,9 +519,20 @@ class LenaUI:
                 pass
     
     def list_instructions(self):
-        instruction_var = "1) SAVE:  Saves all the data currently in all fields.\n"
-        instruction_var += "2) LOAD:  Loads the data last saved in all fields.\n"
+        "This method creates a list of instructions for the User interface and returns it." 
+        instruction_var = "1) SAVE:  Saves all the data currently in all fields\n"
+        instruction_var += "2) LOAD:  Loads the data last saved in all fields\n"
         instruction_var += "3) RESET:  Empties all fields\n"
-        instruction_var += "4) Input:  Browse to the directory that contains all files for analysis.\n"
-        instruction_var += "5) Output:  Browse to the desired directory for the output file."
+        instruction_var += "4) INPUT:  Browse to the directory that contains all files for analysis\n"
+        instruction_var += "5) OUTPUT:  Browse to the desired directory for the output file\n"
+        instruction_var += "6) OUTPUT FORMAT:  Select the desired format for output file\n"
+        instruction_var += "7) TYPE OF ANALYSIS:  Choose the type of analysis to be done and its variables\n"
+        instruction_var += "\tA--->B  or  (A---> B)---> C: type of analysis performed\n"
+        instruction_var += "\tA, B, C:  Drop down menus to select desired variables\n\n"           
+        instruction_var += "8) PAUSE DURATION:  Use entry field, slider bar, and/or buttons to choose pause duration\n"
+        instruction_var += "\tEntry field:  enter in specific pause duration\n"
+        instruction_var += "\tSlider bar:  Click and hold to move along bar\n"
+        instruction_var += "\tButtons(<,>):  Moves slider bar by .1 in specified direction\n\n"
+        instruction_var += "9) ENABLE ROUNDING:  Select to enable rouding\n"
+        instruction_var += "10) SUBMIT:  Submits the current data in fields to the program to start analysis\n"
         return instruction_var
