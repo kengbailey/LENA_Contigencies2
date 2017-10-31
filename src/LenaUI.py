@@ -372,6 +372,7 @@ class LenaUI:
     def load_config(self):
         "This method loads a config file for the program"
 
+
     def reset_config(self):
         "This method resets the all program options"
         self.input_dir = StringVar()
@@ -398,6 +399,7 @@ class LenaUI:
             seq_config_string = str(self.seq_config)
             config_save_file.write(seq_config_string)
             self.write_to_window("Configuration successfully saved! ")
+            config_save_file.close()
             
     
     def load_instruction_window(self):
