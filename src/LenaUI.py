@@ -19,7 +19,6 @@ import threading
 import time
 import xlsxwriter
 import ast
-import tkMessageBox
 
 MAC = 'Darwin'
 AB = 'A_B'
@@ -73,7 +72,7 @@ class LenaUI:
         
         # help menu
         help_menu = Menu(menubar) # create "Help" menu item 
-        help_menu.add_command(label="Instructions", command=self.load_instruction_window) # add a command to "Help" menu item
+        help_menu.add_command(label="Instructions", command=self.testing123) # add a command to "Help" menu item
         menubar.add_cascade(label="Help", menu=help_menu) # attach "Help" menu item to helpbar
 
         # setup main frames to grid
@@ -104,12 +103,10 @@ class LenaUI:
         thread.start()
 
     def change_pause_legnthU(self, event):
-        "This method increases pause duration"
         if self.pause_duration.get() < 35.0:
             self.pause_duration.set(self.pause_duration.get()+0.1)
 
     def change_pause_lengthD(self, event):
-        "This method decreases pause duration"
         if self.pause_duration.get() >= 0.1:
             self.pause_duration.set(self.pause_duration.get()-0.1)
 
@@ -162,24 +159,24 @@ class LenaUI:
 			'CHF','CXN','CXF','NON','NOF','OLN','OLF','TVN', \
 			'TVF','SIL']
 
-        mid_abc_a_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_a, width=8)
-        mid_abc_a_btn['values'] = codes
-        mid_abc_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
-        mid_abc_b_btn['values'] = codes
-        mid_abc_c_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_c, width=8)
-        mid_abc_c_btn['values'] = codes  
+        self.mid_abc_a_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_a, width=8)
+        self.mid_abc_a_btn['values'] = codes
+        self.mid_abc_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
+        self.mid_abc_b_btn['values'] = codes
+        self.mid_abc_c_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_c, width=8)
+        self.mid_abc_c_btn['values'] = codes  
 
         def disable_c():
-            mid_abc_c_btn.configure(state="disable")
-            mid_abc_c_btn.update()
+            self.mid_abc_c_btn.configure(state="disable")
+            self.mid_abc_c_btn.update()
 
         def enable_c():
-            mid_abc_c_btn.configure(state="normal")
-            mid_abc_c_btn.update()
+            self.mid_abc_c_btn.configure(state="normal")
+            self.mid_abc_c_btn.update()
 
         mid_type_label = ttk.Label(self.mid_frame, text='Type of Analysis')       
-        mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=self.sequence_type, value=AB, command=disable_c)
-        mid_abc_btn = ttk.Radiobutton(self.mid_frame, text='( A ---> B ) ---> C', variable=self.sequence_type, value=ABC, command=enable_c)        
+        self.mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=self.sequence_type, value=AB, command=disable_c)
+        self.mid_abc_btn = ttk.Radiobutton(self.mid_frame, text='( A ---> B ) ---> C', variable=self.sequence_type, value=ABC, command=enable_c)        
         mid_filler_label = ttk.Label(self.mid_frame, text="     ")
         mid_conf_label = ttk.Label(self.mid_frame, text="Configure Analysis")
         mid_conf_abc_a_label = ttk.Label(self.mid_frame, text="A") 
@@ -189,30 +186,30 @@ class LenaUI:
         mid_filler_label2 = ttk.Label(self.mid_frame, text="     ")
         mid_pause_label = ttk.Label(self.mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(self.mid_frame, text="     ")
-        mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=35.0, variable=self.pause_duration)
+        self.mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=35.0, variable=self.pause_duration)
         mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(self), width=1)
         mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(self), width=1)
-        mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=4)
-        mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", variable=self.rounding_enabled,onvalue=True, offvalue=False)
+        self.mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=4)
+        self.mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", variable=self.rounding_enabled,onvalue=True, offvalue=False)
 
 
         # setup mid frame widgets
         mid_type_label.grid(row=0, column=0, columnspan=4)
-        mid_ab_btn.grid(row=1, column=0, columnspan=3, sticky = W)
-        mid_abc_btn.grid(row=2, column=0, columnspan=3, sticky = W)
+        self.mid_ab_btn.grid(row=1, column=0, columnspan=3, sticky = W)
+        self.mid_abc_btn.grid(row=2, column=0, columnspan=3, sticky = W)
         mid_conf_abc_a_label.grid(row=3, column=0)
         mid_conf_abc_b_label.grid(row=3, column=1)
         mid_conf_abc_c_label.grid(row=3, column=2)
-        mid_abc_a_btn.grid(row=4, column=0)
-        mid_abc_b_btn.grid(row=4, column=1)
-        mid_abc_c_btn.grid(row=4, column=2)
+        self.mid_abc_a_btn.grid(row=4, column=0)
+        self.mid_abc_b_btn.grid(row=4, column=1)
+        self.mid_abc_c_btn.grid(row=4, column=2)
         mid_filler_label3.grid(row=5, column=0, columnspan=3)
         mid_pause_label.grid(row=6, column=0, columnspan=4, pady=5)
-        mid_pause_entry.grid(row=7, column=0)
-        mid_pause_slider.grid(row=7, column=1, sticky=W)
+        self.mid_pause_entry.grid(row=7, column=0)
+        self.mid_pause_slider.grid(row=7, column=1, sticky=W)
         mid_pause_dn_btn.grid(row=7, column=2, sticky=E)
         mid_pause_up_btn.grid(row=7, column=3, sticky=W)
-        mid_pause_checkbox.grid(row=8, column=0, pady=4, columnspan=4)
+        self.mid_pause_checkbox.grid(row=8, column=0, pady=4, columnspan=4)
 
     def setup_btm_frame(self):
         # BOTTOM FRAME CONFIG
@@ -374,7 +371,6 @@ class LenaUI:
     def load_config(self):
         "This method loads a config file for the program"
 
-
     def reset_config(self):
         "This method resets the all program options"
         self.input_dir = StringVar()
@@ -384,14 +380,42 @@ class LenaUI:
         self.var_b = StringVar()
         self.var_c = StringVar()
         self.pause_duration = DoubleVar()
+        self.csv_var.set(1)
+        self.txt_var.set(0)
+        self.xl_var.set(0)
+        self.rounding_enabled = BooleanVar()
+    
+        #error
+        self.top_in_path.configure(state="normal")
+        self.top_out_path.configure(state="normal")
+        self.top_in_path.update()
+        self.top_out_path.update()
         self.top_in_path.delete(0,END)
         self.top_out_path.delete(0,END)
-        self.mid_ab_btn.deselect()
-        self.mid_abc_btn.deselect()
+        self.top_in_path.configure(state=DISABLED)
+        self.top_out_path.configure(state=DISABLED)
+        self.top_in_path.update()
+        self.top_out_path.update()
+
+        self.mid_ab_btn.configure(variable=self.sequence_type)
+        self.mid_abc_btn.configure(variable=self.sequence_type)
+        self.mid_ab_btn.update()
+        self.mid_abc_btn.update()
+
         self.mid_abc_a_btn.delete(0,END)
         self.mid_abc_b_btn.delete(0,END)
         self.mid_abc_c_btn.delete(0,END)
-        self.mid_pause_entry.delete(0,END)
+
+        self.mid_pause_slider.configure(from_=0.0, to=35.0, variable=self.pause_duration)
+        self.mid_pause_slider.update()
+
+        #error
+        self.mid_pause_entry.configure(variable=self.pause_duration)
+        self.mid_pause_entry.update()
+
+        #error
+        self.mid_pause_checkbox.configure(variable=self.rounding_enabled, onvalue=True, offvalue=False)
+        self.mid_pause_checkbox.update()
         
     def save_config(self):
         "This method allows the user to save the program's current configuration"
@@ -401,12 +425,10 @@ class LenaUI:
             seq_config_string = str(self.seq_config)
             config_save_file.write(seq_config_string)
             self.write_to_window("Configuration successfully saved! ")
-            config_save_file.close()
             
     
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
-        tkMessageBox.showinfo("Istructions",self.list_instructions())
 
     def ouput_txt(self, results):
         "This method outputs the analysis results to a .txt file"
@@ -517,22 +539,3 @@ class LenaUI:
                 child.configure(state='enable')
             except:
                 pass
-    
-    def list_instructions(self):
-        "This method creates a list of instructions for the User interface and returns it." 
-        instruction_var = "1) SAVE:  Saves all the data currently in all fields\n"
-        instruction_var += "2) LOAD:  Loads the data last saved in all fields\n"
-        instruction_var += "3) RESET:  Empties all fields\n"
-        instruction_var += "4) INPUT:  Browse to the directory that contains all files for analysis\n"
-        instruction_var += "5) OUTPUT:  Browse to the desired directory for the output file\n"
-        instruction_var += "6) OUTPUT FORMAT:  Select the desired format for output file\n"
-        instruction_var += "7) TYPE OF ANALYSIS:  Choose the type of analysis to be done and its variables\n"
-        instruction_var += "\tA--->B  or  (A---> B)---> C: type of analysis performed\n"
-        instruction_var += "\tA, B, C:  Drop down menus to select desired variables\n\n"           
-        instruction_var += "8) PAUSE DURATION:  Use entry field, slider bar, and/or buttons to choose pause duration\n"
-        instruction_var += "\tEntry field:  enter in specific pause duration\n"
-        instruction_var += "\tSlider bar:  Click and hold to move along bar\n"
-        instruction_var += "\tButtons(<,>):  Moves slider bar by .1 in specified direction\n\n"
-        instruction_var += "9) ENABLE ROUNDING:  Select to enable rouding\n"
-        instruction_var += "10) SUBMIT:  Submits the current data in fields to the program to start analysis\n"
-        return instruction_var
