@@ -373,6 +373,7 @@ class LenaUI:
 
     def reset_config(self):
         "This method resets the all program options"
+        # re-initialize key variables used in the UI
         self.input_dir = StringVar()
         self.output_dir = StringVar()
         self.sequence_type = StringVar()
@@ -380,42 +381,37 @@ class LenaUI:
         self.var_b = StringVar()
         self.var_c = StringVar()
         self.pause_duration = DoubleVar()
+
+        # re-initialize the selections
         self.csv_var.set(1)
         self.txt_var.set(0)
         self.xl_var.set(0)
-        self.rounding_enabled = BooleanVar()
+        self.rounding_enabled.set(0)
     
-        #error
-        self.top_in_path.configure(state="normal")
-        self.top_out_path.configure(state="normal")
-        self.top_in_path.update()
-        self.top_out_path.update()
-        self.top_in_path.delete(0,END)
-        self.top_out_path.delete(0,END)
-        self.top_in_path.configure(state=DISABLED)
-        self.top_out_path.configure(state=DISABLED)
+        # reset the in and out dir
+        self.top_in_path.configure(textvariable=self.input_dir)
+        self.top_out_path.configure(textvariable=self.output_dir)
         self.top_in_path.update()
         self.top_out_path.update()
 
+        # reset the selection to nothing selected
         self.mid_ab_btn.configure(variable=self.sequence_type)
         self.mid_abc_btn.configure(variable=self.sequence_type)
         self.mid_ab_btn.update()
         self.mid_abc_btn.update()
 
+        # reset the entry boxes for A, B, and C
         self.mid_abc_a_btn.delete(0,END)
         self.mid_abc_b_btn.delete(0,END)
         self.mid_abc_c_btn.delete(0,END)
 
-        self.mid_pause_slider.configure(from_=0.0, to=35.0, variable=self.pause_duration)
-        self.mid_pause_slider.update()
-
         #error
+        """
+        self.mid_pause_slider.configure(variable=self.pause_duration)
+        self.mid_pause_slider.update()
         self.mid_pause_entry.configure(variable=self.pause_duration)
         self.mid_pause_entry.update()
-
-        #error
-        self.mid_pause_checkbox.configure(variable=self.rounding_enabled, onvalue=True, offvalue=False)
-        self.mid_pause_checkbox.update()
+        """
         
     def save_config(self):
         "This method allows the user to save the program's current configuration"
