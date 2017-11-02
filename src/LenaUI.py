@@ -428,7 +428,6 @@ class LenaUI:
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
         instruction_var = self.list_instructions() 
-        tkMessageBox.showinfo("Istructions",instruction_var)
         tkMessageBox.showinfo("Istructions",self.list_instructions())
     
     def ouput_txt(self, results):
