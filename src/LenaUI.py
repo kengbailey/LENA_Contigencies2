@@ -19,6 +19,7 @@ import threading
 import time
 import xlsxwriter
 import ast
+import csv
 
 MAC = 'Darwin'
 AB = 'A_B'
@@ -439,8 +440,35 @@ class LenaUI:
         if '.csv' in self.output_format:
             # output code
             print("Output in .csv")
-            pass
-        pass
+            out_file = self.seq_config['outputDirPath'] +'//'+ 'test.csv'
+            with open( out_file, 'wb') as f:#open csv file to be written in
+                csv_writer = csv.writer(f, delimiter = ',')
+                
+                if 'MAN' and 'FAN' in results[0]: #Check whether MAN and FAN are in the header row
+                    i = 0
+                    for line in results:# loop that splits into list 
+                        line = line.split(',')
+                        results[i] = line 
+                        i+=1  
+
+                        
+                    results[0].pop(3) # gets rid of extra cell
+                    results[0][2] = 'MAN+FAN' # changes cell MAN to MAN+FAN
+
+                    for line in results[1:]: # loops through list of results after header row
+                        line[2] = int(line[2]) #turns cell value related to MAN to an integer
+                        line[3] = int(line[3]) #turns cell value related  to FAN to an integer
+                        man_fan_val = sum(line[2:4]) # add both int values to create MAN+FAN sum
+                        line[2] = man_fan_val # places MAN+FAN value into correct cell
+                        line.pop(3) #gets rid of extra cell after MAN+FAN
+
+
+                    for line in results:# loop writes rows according to MAN+FAN format
+                        csv_writer.writerow(line) 
+                else:
+                    for line in results:#loop to write rows to csv file
+                        line = line.split(',')
+                        csv_writer.writerow(line)
 
     def output_xlsx(self, results):
         "This method outputs the analysis results to a .xlsx file"
