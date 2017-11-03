@@ -126,10 +126,10 @@ class LenaUI:
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
         top_format_label = ttk.Label(self.top_frame, text="Output Format")        
-        top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.set_output_var, variable=self.csv_var,onvalue=1, offvalue=0)
+        self.top_csv_btn = ttk.Checkbutton(self.top_frame, text='.csv', command=self.set_output_var, variable=self.csv_var,onvalue=1, offvalue=0)
         self.csv_var.set(1) # set to csv default
-        top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.set_output_var, variable=self.txt_var,onvalue=1, offvalue=0)
-        top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.set_output_var, variable=self.xl_var,onvalue=1, offvalue=0)
+        self.top_txt_btn = ttk.Checkbutton(self.top_frame, text=".txt", command=self.set_output_var, variable=self.txt_var,onvalue=1, offvalue=0)
+        self.top_xl_btn = ttk.Checkbutton(self.top_frame, text=".xlsx", command=self.set_output_var, variable=self.xl_var,onvalue=1, offvalue=0)
         top_filler = ttk.Label(self.top_frame, text="      ")
         top_in_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_input_dir)    #Browse button for input directory //J
         top_out_browse_btn = ttk.Button(self.top_frame, text="Browse...", command=self.select_output_dir)   #Browse button for output directory //J
@@ -148,9 +148,9 @@ class LenaUI:
         
         top_format_label.grid(row=5, column=0, columnspan=2)
         top_filler.grid(row=4, column=0)
-        top_csv_btn.grid(row=6, column=0)
-        top_txt_btn.grid(row=6, column=1)
-        top_xl_btn.grid(row=6, column=2)
+        self.top_csv_btn.grid(row=6, column=0)
+        self.top_txt_btn.grid(row=6, column=1)
+        self.top_xl_btn.grid(row=6, column=2)
         top_load_btn.grid(row=0, column=2)
         top_save_btn.grid(row=0, column=1)
     
@@ -397,14 +397,24 @@ class LenaUI:
         self.txt_var.set(0)
         self.xl_var.set(0)
         self.rounding_enabled.set(0)
+
+        # re-initialize the selections update
+        self.top_csv_btn.configure(variable=self.csv_var)
+        self.top_txt_btn.configure(variable=self.txt_var)
+        self.top_xl_btn.configure(variable=self.xl_var)
+        self.mid_pause_checkbox.configure(variable=self.rounding_enabled)
+        self.top_csv_btn.update()
+        self.top_txt_btn.update()
+        self.top_xl_btn.update()
+        self.mid_pause_checkbox.update()
     
-        # reset the in and out dir
+        # reset the in and out dir update
         self.top_in_path.configure(textvariable=self.input_dir)
         self.top_out_path.configure(textvariable=self.output_dir)
         self.top_in_path.update()
         self.top_out_path.update()
 
-        # reset the selection to nothing selected
+        # reset the selection to nothing selected update
         self.mid_ab_btn.configure(variable=self.sequence_type)
         self.mid_abc_btn.configure(variable=self.sequence_type)
         self.mid_ab_btn.update()
@@ -415,7 +425,7 @@ class LenaUI:
         self.mid_abc_b_btn.delete(0,END)
         self.mid_abc_c_btn.delete(0,END)
 
-        #error
+        # reset slider and pause_duration entry box update
         self.mid_pause_slider.configure(variable=self.pause_duration)
         self.mid_pause_entry.configure(textvariable=self.pause_duration)
         self.mid_pause_slider.update()
