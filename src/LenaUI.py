@@ -384,6 +384,14 @@ class LenaUI:
         self.var_c = StringVar()
         self.pause_duration = DoubleVar()
 
+        # re-initialize the A, B, & C entry boxes
+        self.mid_abc_a_btn.configure(textvariable=self.var_a)
+        self.mid_abc_b_btn.configure(textvariable=self.var_b)
+        self.mid_abc_c_btn.configure(textvariable=self.var_c)
+        self.mid_abc_a_btn.update()
+        self.mid_abc_b_btn.update()
+        self.mid_abc_c_btn.update()
+
         # re-initialize the selections
         self.csv_var.set(1)
         self.txt_var.set(0)
@@ -408,12 +416,12 @@ class LenaUI:
         self.mid_abc_c_btn.delete(0,END)
 
         #error
-        """
         self.mid_pause_slider.configure(variable=self.pause_duration)
+        self.mid_pause_entry.configure(textvariable=self.pause_duration)
         self.mid_pause_slider.update()
-        self.mid_pause_entry.configure(variable=self.pause_duration)
         self.mid_pause_entry.update()
-        """
+
+
         
     def save_config(self):
         "This method allows the user to save the program's current configuration"
