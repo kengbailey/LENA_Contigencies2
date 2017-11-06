@@ -55,6 +55,8 @@ class LenaUI:
         self.output_format.append(".csv") # set to csv default
         self.output_msg = ""
         self.output_msg_counter = 0
+        self.num_threads = IntVar()
+        self.num_threads.set(4)
         
 
         # Create main frames
@@ -75,6 +77,7 @@ class LenaUI:
         # help menu
         help_menu = Menu(menubar) # create "Help" menu item 
         help_menu.add_command(label="Instructions", command=self.load_instruction_window) # add a command to "Help" menu item
+        help_menu.add_command(label="Thread Count", command=self.new_threads_window)
         menubar.add_cascade(label="Help", menu=help_menu) # attach "Help" menu item to helpbar
 
         # setup main frames to grid
@@ -94,15 +97,23 @@ class LenaUI:
         if platform.system() == MAC:
             os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
-    def testing123(self):
+    def new_threads_window(self):
+        # setup
+        t = Toplevel(self.root)
+        t.resizable(False, False)
 
-        def dowork():
-            self.disable_widgets()
-            time.sleep(3)
-            self.enable_widgets()
+        # create widgets
+        top_frame = Frame(t, width=100, height=50)
+        t.wm_title("Set Threads")
+        l = Label(t, text="Set number of threads to use\nwhen performing analysis: \n(default=4)")
+        s = Spinbox(t, from_=4, to=50, textvariable=self.num_threads, width=4)
+        b = ttk.Button(t, text="close", command=lambda: t.destroy(), width=4)
 
-        thread = threading.Thread(target=dowork)
-        thread.start()
+        # arrange widgets
+        l.grid(row=0, column=0, padx=5, pady=7)
+        s.grid(row=1, column=0, sticky=W, padx=15, pady=5)
+        b.grid(row=1,column=0, sticky=E, padx=15, pady=5)
+
 
     def change_pause_legnthU(self, event):
         if self.pause_duration.get() < 35.0:
@@ -121,7 +132,7 @@ class LenaUI:
 
         top_dir_label = ttk.Label(self.top_frame, text="Specify Directory")
         top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.reset_config)
-        top_load_btn = ttk.Button(self.top_frame, text="LOAD", command=self.testing123)
+        top_load_btn = ttk.Button(self.top_frame, text="LOAD", command=self.save_config)
         top_save_btn = ttk.Button(self.top_frame, text="SAVE", command=self.save_config)
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
@@ -338,7 +349,7 @@ class LenaUI:
 
             # grab its file to process in this batch
             tempDict = {}
-            for i in range(MAXTHREADS):
+            for i in range(self.num_threads.get()): # num_threads implementation
                 tempItem = self.its_file_dict.items.popitem()
                 tempDict.update({tempItem[0]:tempItem[1][0]})
 
