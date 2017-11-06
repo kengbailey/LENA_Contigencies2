@@ -114,7 +114,6 @@ class LenaUI:
         s.grid(row=1, column=0, sticky=W, padx=15, pady=5)
         b.grid(row=1,column=0, sticky=E, padx=15, pady=5)
 
-
     def change_pause_legnthU(self, event):
         if self.pause_duration.get() < 35.0:
             self.pause_duration.set(self.pause_duration.get()+0.1)
@@ -228,13 +227,13 @@ class LenaUI:
         # BOTTOM FRAME CONFIG
         # create bottom frame widgets
         btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.run_seqanalysis)
-        btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
+        self.btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
         self.btm_text_window = Text(self.btm_frame, width=45, height=5)
         self.btm_text_window.config(state=DISABLED)
 
         # arrange bottom frame widgets
         btm_submit_btn.grid(row=0, column=1)
-        btm_progress_bar.grid(row=0, column=0)
+        self.btm_progress_bar.grid(row=0, column=0)
         self.btm_text_window.grid(row=1, column=0, columnspan=2)
 
     def select_input_dir(self):
@@ -340,18 +339,30 @@ class LenaUI:
         # threading vars
         results = []
         tLock = threading.Lock()
-        threads=[]
         self.get_its_files()
         t = time.time()
+
+        # progress bar setup
+        progress = 30
+        self.btm_progress_bar['value']=progress
+        self.btm_progress_bar['maximum']=200
+        item_count = len(self.its_file_dict.items)
+        print(item_count)
+        incr = int(200 / item_count)
+        print(incr)
 
         # run sequence analysis on MAXTHREADS at a time
         while len(self.its_file_dict.items) > 0:
 
             # grab its file to process in this batch
             tempDict = {}
+            threads=[]
             for i in range(self.num_threads.get()): # num_threads implementation
-                tempItem = self.its_file_dict.items.popitem()
-                tempDict.update({tempItem[0]:tempItem[1][0]})
+                try:
+                    tempItem = self.its_file_dict.items.popitem()
+                    tempDict.update({tempItem[0]:tempItem[1][0]})
+                except KeyError:
+                    pass # dictionary is empty
 
             # run analysis on all batch .its files       
             for k,v in tempDict.iteritems():
@@ -363,6 +374,9 @@ class LenaUI:
             # wait for threads to finish
             for proc in threads:
                 proc.join()
+                progress = progress + incr
+                if progress > 200: progress = 200
+                self.btm_progress_bar['value'] = progress
                 print("thread done: "+proc.getName())
             done = time.time()-t
         
@@ -441,8 +455,6 @@ class LenaUI:
         self.mid_pause_entry.configure(textvariable=self.pause_duration)
         self.mid_pause_slider.update()
         self.mid_pause_entry.update()
-
-
         
     def save_config(self):
         "This method allows the user to save the program's current configuration"
@@ -453,7 +465,6 @@ class LenaUI:
             config_save_file.write(seq_config_string)
             self.write_to_window("Configuration successfully saved! ")
             
-    
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
         instruction_var = self.list_instructions() 
