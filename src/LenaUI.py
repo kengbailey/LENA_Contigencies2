@@ -115,12 +115,15 @@ class LenaUI:
         b.grid(row=1,column=0, sticky=E, padx=15, pady=5)
 
     def change_pause_legnthU(self, event):
-        if self.pause_duration.get() < 35.0:
-            self.pause_duration.set(self.pause_duration.get()+0.1)
+        if self.pause_duration.get() < 10.0:
+            self.pause_duration.set(round(self.pause_duration.get()+0.1,1))
 
     def change_pause_lengthD(self, event):
         if self.pause_duration.get() >= 0.1:
-            self.pause_duration.set(self.pause_duration.get()-0.1)
+            self.pause_duration.set(round(self.pause_duration.get()-0.1,1))
+
+    def rounding_pause_length(self,event):
+        self.pause_duration.set(round(self.pause_duration.get(),1))
 
     def setup_top_frame(self):
         # TOP FRAME CONFIG
@@ -198,7 +201,7 @@ class LenaUI:
         mid_filler_label2 = ttk.Label(self.mid_frame, text="     ")
         mid_pause_label = ttk.Label(self.mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(self.mid_frame, text="     ")
-        self.mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=35.0, variable=self.pause_duration)
+        self.mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=10.0, variable=self.pause_duration,command=lambda r: self.rounding_pause_length(self))
         mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(self), width=1)
         mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(self), width=1)
         self.mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=4)
