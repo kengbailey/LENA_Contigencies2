@@ -419,6 +419,8 @@ class LenaUI:
         self.mid_abc_c_btn.update()
 
         # re-initialize the selections
+        self.output_format = []
+        self.output_format.append(".csv")
         self.csv_var.set(1)
         self.txt_var.set(0)
         self.xl_var.set(0)
@@ -517,6 +519,7 @@ class LenaUI:
     def output_xlsx(self, results):
         "This method outputs the analysis results to a .xlsx file"
         if '.xlsx' in self.output_format:
+            print("Output in .xlsx")
             # create workbook & add sheet
             out_file = self.seq_config['outputDirPath'] +'//'+ 'test.xlsx'
             workbook = xlsxwriter.Workbook(out_file)
