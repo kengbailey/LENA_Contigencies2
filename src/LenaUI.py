@@ -283,9 +283,10 @@ class LenaUI:
             if len(str(self.var_c.get())) < 2:
                 return "C is not set! "
         
+        
         event = self.check_code()
         if event in ['A','B','C']:
-            return (str(event)+" has invalid event")
+            return (str(event)+" has an invalid event")
 
         # check output_format
         if len(self.output_format) == 0:
