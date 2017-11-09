@@ -401,6 +401,25 @@ class LenaUI:
         
     def load_config(self):
         "This method loads a config file for the program"
+        config_load_file = tkFileDialog.askopenfilename(initialdir="/", title="Select config file", filetypes=(("leco files", "*.leco"), ("all files", "*.*")))
+        while not config_load_file.endswith('.leco'):
+             config_load_file = tkFileDialog.askopenfilename(initialdir="/", title="Select config file (.leco)", filetypes=(("leco files", "*.leco"), ("all files", "*.*")))
+        with open(config_load_file, 'r') as config_opened_file:
+            config_info = config_opened_file.read()
+            config_info = ast.literal_eval(config_info)
+            assert type(config_info) is dict
+            self.top_in_path = config_info['batDir']
+            self.var_a = config_info['A']
+            self.var_b = config_info['B']
+            self.var_c = config_info['C']
+            self.rounding_enabled = config_info['roundingEnabled']
+            self.top_out_path = config_info['outputDirPath']
+            self.sequence_type = config_info['seqType']
+            self.pause_duration = config_info['PauseDur']
+            config_opened_file.close()
+        self.set_config()
+
+        
 
     def reset_config(self):
         "This method resets the all program options"
