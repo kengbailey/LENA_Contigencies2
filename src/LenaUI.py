@@ -27,9 +27,9 @@ AB = 'A_B'
 ABC = 'AB_C'
 OK = 'ok'
 MAXTHREADS = 4
-codes = ['MAN','MAF','FAN','FAF','CHNSP','CHNNSP', \
+codes = ('MAN','MAF','FAN','FAF','CHNSP','CHNNSP', \
 			'CHF','CXN','CXF','NON','NOF','OLN','OLF','TVN', \
-			'TVF','SIL']
+			'TVF','SIL')
 
 class LenaUI:
 
@@ -47,11 +47,12 @@ class LenaUI:
         self.output_format = []
         self.seq_config = {}
         self.pause_duration = DoubleVar()
+        self.pause_duration.set(0.1)
         self.rounding_enabled = BooleanVar()
         self.sequence_type = StringVar()
-        self.var_a = StringVar()
-        self.var_b = StringVar()
-        self.var_c = StringVar()
+        self.var_a = []
+        self.var_b = []
+        self.var_c = []
         self.output_format.append(".csv") # set to csv default
         self.output_msg = ""
         self.output_msg_counter = 0
@@ -166,28 +167,46 @@ class LenaUI:
         self.top_xl_btn.grid(row=6, column=2)
         top_load_btn.grid(row=0, column=2)
         top_save_btn.grid(row=0, column=1)
-    
+
+    def update_var(self, event):
+
+        # get user selection; id -> value
+        selection = event.widget.curselection()
+        templist = []
+        for sel in selection:
+            templist.append(event.widget.get(sel))
+
+        # assign to appropriate var_
+        if (event.widget == self.mid_abc_a_box):
+            self.var_a = templist
+            print("A: "+str(self.var_a))
+        elif (event.widget == self.mid_abc_b_box):
+            self.var_b = templist
+            print("B: "+str(self.var_b))
+        elif (event.widget == self.mid_abc_c_box):
+            self.var_c = templist
+            print("C: "+str(self.var_c))
+
     def setup_mid_frame(self):
         # MID FRAME CONFIG
         # create mid frame widgets
-        codes = ['MAN','MAF','FAN','FAF','CHNSP','CHNNSP', \
-			'CHF','CXN','CXF','NON','NOF','OLN','OLF','TVN', \
-			'TVF','SIL']
+        code_vars = StringVar(value=codes)
 
-        self.mid_abc_a_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_a, width=8)
-        self.mid_abc_a_btn['values'] = codes
-        self.mid_abc_b_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_b, width=8)
-        self.mid_abc_b_btn['values'] = codes
-        self.mid_abc_c_btn = ttk.Combobox(self.mid_frame, textvariable=self.var_c, width=8)
-        self.mid_abc_c_btn['values'] = codes  
+        self.mid_abc_a_box = Listbox(self.mid_frame, height=16, listvariable=code_vars, selectmode=MULTIPLE, width=9, exportselection=False)
+        self.mid_abc_b_box = Listbox(self.mid_frame, height=16, listvariable=code_vars, selectmode=MULTIPLE, width=9, exportselection=False)
+        self.mid_abc_c_box = Listbox(self.mid_frame, height=16, listvariable=code_vars, selectmode=MULTIPLE, width=9, exportselection=False)
+        
+        self.mid_abc_a_box.bind("<<ListboxSelect>>", self.update_var)
+        self.mid_abc_b_box.bind("<<ListboxSelect>>", self.update_var)
+        self.mid_abc_c_box.bind("<<ListboxSelect>>", self.update_var)
 
         def disable_c():
-            self.mid_abc_c_btn.configure(state="disable")
-            self.mid_abc_c_btn.update()
+            self.mid_abc_c_box.configure(state="disable")
+            self.mid_abc_c_box.update()
 
         def enable_c():
-            self.mid_abc_c_btn.configure(state="normal")
-            self.mid_abc_c_btn.update()
+            self.mid_abc_c_box.configure(state="normal")
+            self.mid_abc_c_box.update()
 
         mid_type_label = ttk.Label(self.mid_frame, text='Type of Analysis')       
         self.mid_ab_btn = ttk.Radiobutton(self.mid_frame, text='A ---> B', variable=self.sequence_type, value=AB, command=disable_c)
@@ -215,9 +234,10 @@ class LenaUI:
         mid_conf_abc_a_label.grid(row=3, column=0)
         mid_conf_abc_b_label.grid(row=3, column=1)
         mid_conf_abc_c_label.grid(row=3, column=2)
-        self.mid_abc_a_btn.grid(row=4, column=0)
-        self.mid_abc_b_btn.grid(row=4, column=1)
-        self.mid_abc_c_btn.grid(row=4, column=2)
+        self.mid_abc_a_box.grid(row=4, column=0)
+        self.mid_abc_b_box.grid(row=4, column=1)
+        self.mid_abc_c_box.grid(row=4, column=2)
+
         mid_filler_label3.grid(row=5, column=0, columnspan=3)
         mid_pause_label.grid(row=6, column=0, columnspan=4, pady=5)
         self.mid_pause_entry.grid(row=7, column=0)
@@ -229,6 +249,7 @@ class LenaUI:
     def setup_btm_frame(self):
         # BOTTOM FRAME CONFIG
         # create bottom frame widgets
+
         btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.run_seqanalysis)
         self.btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
         self.btm_text_window = Text(self.btm_frame, width=45, height=5)
@@ -249,15 +270,6 @@ class LenaUI:
         "This method looks creates a dict of all .its files found in the input directory"
         self.its_file_dict = Batch(self.input_dir.get())
 
-    def check_code(self):
-        if self.var_a.get() not in codes:
-            return 'A'
-        if self.var_b.get() not in codes:
-            return 'B'
-        if self.sequence_type.get() == ABC:
-            if self.var_c.get() not in codes:
-                return 'C' 
-
     def check_config(self):
         "This method checks if all seq_config values are set. Returns error message if any aren't set."
 
@@ -274,25 +286,20 @@ class LenaUI:
             return "Sequence Type not set! "
 
         # check var_a
-        if len(str(self.var_a.get())) < 2:
+        if not self.var_a:
             return "A is not set! "
 
         # check var_b
-        if len(str(self.var_b.get())) < 2:
+        if not self.var_b:
             return "B is not set! "
 
         # check var_c
         if (self.sequence_type.get() == ABC):
-            if len(str(self.var_c.get())) < 2:
+            if not self.var_c:
                 return "C is not set! "
-        
-        
-        event = self.check_code()
-        if event in ['A','B','C']:
-            return (str(event)+" has an invalid event")
 
         # check output_format
-        if len(self.output_format) == 0:
+        if not self.output_format:
             return "Output format not set! "
         else:
             self.write_to_window("All config options are valid!")
@@ -310,9 +317,9 @@ class LenaUI:
 
         # all config options set, so fill self.seq_config
         self.seq_config['batDir'] = self.top_in_path.get()
-        self.seq_config['A'] = self.var_a.get()
-        self.seq_config['B'] = self.var_b.get()
-        self.seq_config['C'] = self.var_c.get()
+        self.seq_config['A'] = ','.join(map(str, self.var_a)) 
+        self.seq_config['B'] = ','.join(map(str, self.var_b))
+        self.seq_config['C'] = ','.join(map(str, self.var_c))
         self.seq_config['outputContent'] = ""
         self.seq_config['roundingEnabled'] = str(self.rounding_enabled.get())
         self.seq_config['P'] = 'Pause'
@@ -330,7 +337,7 @@ class LenaUI:
         r = self.set_config()
         if r != True:
             return 
-
+        
         # start analysis 
         thread = threading.Thread(target=self.sequence_analysis)
         thread.start()
@@ -367,11 +374,11 @@ class LenaUI:
                     tempDict.update({tempItem[0]:tempItem[1][0]})
                 except KeyError:
                     pass # dictionary is empty
-
+            
             # run analysis on all batch .its files       
             for k,v in tempDict.iteritems():
                 sa = SeqAnalysis(self.seq_config, k, v)
-                proc = threading.Thread(target=sa.Perform, args=(str(v), results, tLock))
+                proc = threading.Thread(target=sa.Perform, args=(str(v), results, tLock,))
                 threads.append(proc)
                 proc.start()
                 
@@ -398,8 +405,8 @@ class LenaUI:
         # send success message to window
         self.write_to_window("Successfully Sequence Analysis! Files processed in {} seconds".format(round(done, 2)))
         self.enable_widgets()
-        
-    def load_config(self):
+         
+def load_config(self):
         "This method loads a config file for the program"
         config_load_file = tkFileDialog.askopenfilename(initialdir="/", title="Select config file", filetypes=(("leco files", "*.leco"), ("all files", "*.*")))
         while not config_load_file.endswith('.leco'):
@@ -418,27 +425,23 @@ class LenaUI:
             self.pause_duration = config_info['PauseDur']
             config_opened_file.close()
         self.set_config()
-
         
-
     def reset_config(self):
         "This method resets the all program options"
         # re-initialize key variables used in the UI
         self.input_dir = StringVar()
         self.output_dir = StringVar()
         self.sequence_type = StringVar()
-        self.var_a = StringVar()
-        self.var_b = StringVar()
-        self.var_c = StringVar()
         self.pause_duration = DoubleVar()
+        self.pause_duration.set(0.1)
 
         # re-initialize the A, B, & C entry boxes
-        self.mid_abc_a_btn.configure(textvariable=self.var_a)
-        self.mid_abc_b_btn.configure(textvariable=self.var_b)
-        self.mid_abc_c_btn.configure(textvariable=self.var_c)
-        self.mid_abc_a_btn.update()
-        self.mid_abc_b_btn.update()
-        self.mid_abc_c_btn.update()
+        self.mid_abc_a_box.select_clear(0,END)
+        self.mid_abc_b_box.select_clear(0,END)
+        self.mid_abc_c_box.select_clear(0,END)
+        self.var_a = []
+        self.var_b = []
+        self.var_c = []
 
         # re-initialize the selections
         self.output_format = []
@@ -470,11 +473,6 @@ class LenaUI:
         self.mid_ab_btn.update()
         self.mid_abc_btn.update()
 
-        # reset the entry boxes for A, B, and C
-        self.mid_abc_a_btn.delete(0,END)
-        self.mid_abc_b_btn.delete(0,END)
-        self.mid_abc_c_btn.delete(0,END)
-
         # reset slider and pause_duration entry box update
         self.mid_pause_slider.configure(variable=self.pause_duration)
         self.mid_pause_entry.configure(textvariable=self.pause_duration)
@@ -501,7 +499,7 @@ class LenaUI:
             # output code 
             print("Output in .txt")
             out_file = self.seq_config['outputDirPath'] +'//'+ 'test.txt'
-            with open(outfile,'w') as f:
+            with open(out_file,'w') as f:
                 for line in results:
                     line = line.split(',')
                     f.writelines(line)
@@ -612,6 +610,14 @@ class LenaUI:
                 child.configure(state='enable')
             except:
                 pass
+        
+        # Listbox reset
+        self.mid_abc_a_box.configure(state="normal")
+        self.mid_abc_a_box.update()
+        self.mid_abc_b_box.configure(state="normal")
+        self.mid_abc_b_box.update()
+        self.mid_abc_c_box.configure(state="normal")
+        self.mid_abc_c_box.update()
     
     def list_instructions(self):
         instruction_var = "1) SAVE:  Saves all the data currently in all fields.\n"

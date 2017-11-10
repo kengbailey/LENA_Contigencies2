@@ -110,7 +110,7 @@ class EItemList:
 	def SeqAn(self):
 		numItems = self.Size()
 		# A-->B
-		if self._varMap["seqType"] is 'A_B':
+		if self._varMap['seqType'] == 'A_B':
 			print 'A-->B Analysis in progress...'
 			# iterate over event items
 			for i in range(0, numItems-1):
@@ -125,7 +125,7 @@ class EItemList:
 				elif curr.spkr not in self._varMap["A"] and next.spkr not in self._varMap["B"]:
 					self.contingencies["d"] += 1
 		# (A-->B)-->C
-		elif self._varMap["seqType"] is 'AB_C':
+		elif self._varMap['seqType'] == 'AB_C':
 			print '(A-->B)-->C Analysis in progress...'
 			# iterate over event items
 			for i in range(0, numItems-2):
@@ -168,7 +168,6 @@ class EItemList:
 		tok_c = float(self.contingencies["c"])
 		tok_d = float(self.contingencies["d"])
 
-		# OCV (operant contingency value) = a/(a+b) – c/(c+d)
 		OCV = (tok_a / (tok_a + tok_b)) - (tok_c / (tok_c + tok_d))
 
 		rt += str(self.contingencies["a"]) + ',' + str(self.contingencies["b"]) + ',' + str(self.contingencies["c"]) + ',' + str(self.contingencies["d"]) + ',' + str(OCV)
