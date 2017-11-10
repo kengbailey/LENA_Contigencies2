@@ -406,7 +406,7 @@ class LenaUI:
         self.write_to_window("Successfully Sequence Analysis! Files processed in {} seconds".format(round(done, 2)))
         self.enable_widgets()
          
-def load_config(self):
+    def load_config(self):
         "This method loads a config file for the program"
         config_load_file = tkFileDialog.askopenfilename(initialdir="/", title="Select config file", filetypes=(("leco files", "*.leco"), ("all files", "*.*")))
         while not config_load_file.endswith('.leco'):
