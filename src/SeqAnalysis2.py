@@ -179,8 +179,6 @@ class SeqAnalysis:
 		self.pID=pID
 		self.path=path
 		self.varMap = varMap
-		# for fpath in self.fpaths:
-		# self.Perform(fpath)
 
 	def Perform(self, path, results, tLock):
 		# Announce
