@@ -173,7 +173,7 @@ class EItemList:
 
 		rt += str(self.contingencies["a"]) + ',' + str(self.contingencies["b"]) + ',' + str(self.contingencies["c"]) + ',' + str(self.contingencies["d"]) + ',' + str(OCV)
 		return rt
-
+	
 class SeqAnalysis:
 	def __init__(self, varMap, pID, path):
 		self.pID=pID
