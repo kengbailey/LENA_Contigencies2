@@ -168,7 +168,7 @@ class EItemList:
 		tok_c = float(self.contingencies["c"])
 		tok_d = float(self.contingencies["d"])
 
-		# OCV (operant contingency value) = a/(a+b) – c/(c+d)
+		# OCV operant contingency value
 		OCV = (tok_a / (tok_a + tok_b)) - (tok_c / (tok_c + tok_d))
 
 		rt += str(self.contingencies["a"]) + ',' + str(self.contingencies["b"]) + ',' + str(self.contingencies["c"]) + ',' + str(self.contingencies["d"]) + ',' + str(OCV)
