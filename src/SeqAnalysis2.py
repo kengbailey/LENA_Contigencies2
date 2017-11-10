@@ -168,6 +168,7 @@ class EItemList:
 		tok_c = float(self.contingencies["c"])
 		tok_d = float(self.contingencies["d"])
 
+		# OCV (operant contingency value) = a/(a+b) – c/(c+d)
 		OCV = (tok_a / (tok_a + tok_b)) - (tok_c / (tok_c + tok_d))
 
 		rt += str(self.contingencies["a"]) + ',' + str(self.contingencies["b"]) + ',' + str(self.contingencies["c"]) + ',' + str(self.contingencies["d"]) + ',' + str(OCV)
@@ -178,8 +179,8 @@ class SeqAnalysis:
 		self.pID=pID
 		self.path=path
 		self.varMap = varMap
-		#for fpath in self.fpaths:
-		#	self.Perform(fpath)
+		# for fpath in self.fpaths:
+		# self.Perform(fpath)
 
 	def Perform(self, path, results, tLock):
 		# Announce
