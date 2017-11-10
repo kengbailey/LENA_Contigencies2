@@ -501,8 +501,7 @@ class LenaUI:
             out_file = self.seq_config['outputDirPath'] +'//'+ 'test.txt'
             with open(out_file,'w') as f:
                 for line in results:
-                    line = line.split(',')
-                    f.writelines(line)
+                    f.writelines(line+"\n")
 
     def output_csv(self, results):
         "This method outputs the analysis results to a .csv file"
