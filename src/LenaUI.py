@@ -622,8 +622,6 @@ class LenaUI:
         instruction_var = "1) SAVE:  Saves all the data currently in all fields.\n"
         instruction_var += "2) LOAD:  Loads the data last saved in all fields.\n"
         instruction_var += "3) RESET:  Empties all fields\n"
-        instruction_var += "4) Input:  Browse to the directory that contains all files for analysis.\n"
-        instruction_var += "5) Output:  Browse to the desired directory for the output file."
         instruction_var += "4) INPUT:  Browse to the directory that contains all files for analysis\n"
         instruction_var += "5) OUTPUT:  Browse to the desired directory for the output file\n"
         instruction_var += "6) OUTPUT FORMAT:  Select the desired format for output file\n"
