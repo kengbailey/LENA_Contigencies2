@@ -21,6 +21,7 @@ import xlsxwriter
 import ast
 import csv
 import tkMessageBox
+import datetime
 
 MAC = 'Darwin'
 AB = 'A_B'
@@ -30,6 +31,9 @@ MAXTHREADS = 4
 codes = ('MAN','MAF','FAN','FAF','CHNSP','CHNNSP', \
 			'CHF','CXN','CXF','NON','NOF','OLN','OLF','TVN', \
 			'TVF','SIL')
+codes_index = {'MAN':0,'MAF':1,'FAN':2,'FAF':3,'CHNSP':4,'CHNNSP':5, \
+			'CHF':6,'CXN':7,'CXF':8,'NON':9,'NOF':10,'OLN':11,'OLF':12,'TVN':13, \
+			'TVF':14,'SIL':15}
 
 class LenaUI:
 
@@ -58,6 +62,7 @@ class LenaUI:
         self.output_msg_counter = 0
         self.num_threads = IntVar()
         self.num_threads.set(4)
+        self.batch_store = None
         
 
         # Create main frames
@@ -135,7 +140,7 @@ class LenaUI:
 
         top_dir_label = ttk.Label(self.top_frame, text="Specify Directory")
         top_reset_btn = ttk.Button(self.top_frame, text="RESET", command=self.reset_config)
-        top_load_btn = ttk.Button(self.top_frame, text="LOAD", command=self.save_config)
+        top_load_btn = ttk.Button(self.top_frame, text="LOAD", command=self.load_config)
         top_save_btn = ttk.Button(self.top_frame, text="SAVE", command=self.save_config)
         top_input_label = ttk.Label(self.top_frame, text="Input:")
         top_output_label = ttk.Label(self.top_frame, text="Output:")
@@ -226,7 +231,6 @@ class LenaUI:
         self.mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=4)
         self.mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", variable=self.rounding_enabled,onvalue=True, offvalue=False)
 
-
         # setup mid frame widgets
         mid_type_label.grid(row=0, column=0, columnspan=4)
         self.mid_ab_btn.grid(row=1, column=0, columnspan=3, sticky = W)
@@ -261,10 +265,14 @@ class LenaUI:
         self.btm_text_window.grid(row=1, column=0, columnspan=2)
 
     def select_input_dir(self):
-        self.input_dir.set(tkFileDialog.askdirectory())
+        input_dir = tkFileDialog.askdirectory()
+        if input_dir:
+            self.input_dir.set(input_dir)
 
     def select_output_dir(self):
-        self.output_dir.set(tkFileDialog.askdirectory())
+        output_dir = tkFileDialog.askdirectory()
+        if output_dir:            
+            self.output_dir.set(output_dir)
 
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
@@ -326,6 +334,7 @@ class LenaUI:
         self.seq_config['outputDirPath'] = self.top_out_path.get()
         self.seq_config['seqType'] = self.sequence_type.get()
         self.seq_config['PauseDur'] = str(round(self.pause_duration.get(), 1))
+        self.seq_config['outputTypes'] = ''.join(self.output_format)
 
         self.write_to_window("Config options assembled!")
         return True
@@ -361,6 +370,12 @@ class LenaUI:
         print(item_count)
         incr = int(200 / item_count)
         print(incr)
+
+        # file writing prep
+        if len(self.its_file_dict.items) == 1:
+            self.batch_store = "Single"
+        else:
+            self.batch_store = "Batch"+str(len(self.its_file_dict.items))
 
         # run sequence analysis on MAXTHREADS at a time
         while len(self.its_file_dict.items) > 0:
@@ -408,24 +423,185 @@ class LenaUI:
          
     def load_config(self):
         "This method loads a config file for the program"
+        
+        # file dialog - select file
         config_load_file = tkFileDialog.askopenfilename(initialdir="/", title="Select config file", filetypes=(("leco files", "*.leco"), ("all files", "*.*")))
         while not config_load_file.endswith('.leco'):
              config_load_file = tkFileDialog.askopenfilename(initialdir="/", title="Select config file (.leco)", filetypes=(("leco files", "*.leco"), ("all files", "*.*")))
-        with open(config_load_file, 'r') as config_opened_file:
-            config_info = config_opened_file.read()
-            config_info = ast.literal_eval(config_info)
-            assert type(config_info) is dict
-            self.top_in_path = config_info['batDir']
-            self.var_a = config_info['A']
-            self.var_b = config_info['B']
-            self.var_c = config_info['C']
-            self.rounding_enabled = config_info['roundingEnabled']
-            self.top_out_path = config_info['outputDirPath']
-            self.sequence_type = config_info['seqType']
-            self.pause_duration = config_info['PauseDur']
-            config_opened_file.close()
-        self.set_config()
         
+        print("Loaded File")
+
+        # open file 
+        new_config = None
+        try:
+            open_file = open(config_load_file, 'r')
+            new_config = ast.literal_eval(open_file.read())
+            assert type(new_config) is dict
+            open_file.close()
+        except:
+            self.write_to_window("Failed to Load File!") 
+            return
+        print("Loaded file to config")
+        
+        # check contents
+        try:
+            # check batDir
+            if(len(new_config['batDir']) < 2):
+                raise Exception("batDir invalid")
+            
+            # check outputDir
+            if(len(new_config['outputDirPath']) < 2):
+                raise Exception("Invalid outputDirPath!")
+
+            # check SeqType
+            if new_config['seqType'] == AB:
+                pass
+            elif new_config['seqType'] == ABC:
+                pass
+            else:
+                raise Exception("seqType Invalid")
+            
+            # check A
+            if not any(x in codes for x in new_config['A'].split(',')):
+                raise Exception("Invalid Var A")
+
+            # check B
+            if not any(x in codes for x in new_config['B'].split(',')):
+                raise Exception("Invalid Var B")
+
+            # check C
+            if(new_config['seqType'] == ABC):
+                if not any(x in codes for x in new_config['C'].split(',')):
+                    raise Exception("Invalid Var C")
+
+            # check rounding enabled
+            if new_config['roundingEnabled'] == 'True':
+                pass
+            elif new_config['roundingEnabled'] == 'False':
+                pass
+            else:
+                raise Exception("Invalid roundingEnabled!")
+
+            # check pause
+            #if(new_config['Pause'] != 'Pause'):
+            #    raise Exception("Invalid P")
+
+            # check pause duration
+            if(float(new_config['PauseDur']) < 0.1 ):
+                raise Exception("Invalid pause duration!")
+
+            # check output formats
+            if not any(x in new_config['outputTypes'] for x in ['csv', 'xlsx', 'txt']):
+                raise Exception("Invalid output types!")
+            
+        except Exception as e:
+            self.write_to_window("FAILURE! Invalid file contents!")
+            print(repr(e))
+            return
+        print("Config contents checked")
+
+        # fill contents to program
+        self.reset_config()
+        
+        ## Fill Vars + seqConfig
+        try:
+            self.seq_config['batDir'] = new_config['batDir']            
+
+            self.seq_config['A'] =  new_config['A']
+
+            self.seq_config['B'] = new_config['B']
+
+            self.seq_config['C'] = new_config['C']     
+
+            self.seq_config['roundingEnabled'] = new_config['roundingEnabled']            
+            
+            self.seq_config['outputDirPath'] = new_config['outputDirPath']
+
+            self.seq_config['seqType'] = new_config['seqType']        
+
+            self.seq_config['PauseDur'] = new_config['PauseDur']            
+
+            self.seq_config['outputTypes'] = new_config['outputTypes']
+            self.output_format = []
+
+            if 'xlsx' in new_config['outputTypes']:
+                self.output_format.append(".xlsx")               
+            if 'csv' in new_config['outputTypes']:
+                self.output_format.append(".csv")                
+            if 'txt' in new_config['outputTypes']:
+                self.output_format.append(".txt")
+                
+            self.seq_config['outputContent'] = ""
+            self.seq_config['P'] = 'Pause'
+            
+            print("Program variables filled")
+        except Exception as e:
+            #self.write_to_window("")
+            print(repr(e))
+            return
+        
+
+        ## Fill Widgets        
+        try:
+            # input and output
+            self.input_dir.set(new_config['batDir'])
+            self.output_dir.set(new_config['outputDirPath'])
+            
+            # output formats
+            if 'txt' in new_config['outputTypes']:
+                self.txt_var.set(1)
+            else:
+                self.txt_var.set(0)
+
+            if 'csv' in new_config['outputTypes']:
+                self.csv_var.set(1)
+            else:
+                self.csv_var.set(0)
+
+            if 'xlsx' in new_config['outputTypes']:
+                self.xl_var.set(1)
+            else:
+                self.xl_var.set(0)
+
+            # sequence type
+            self.sequence_type.set(new_config['seqType'])
+            
+            # var_a/b/c
+            #self.mid_abc_a_box
+            var_a_list = new_config['A'].split(',')
+            for item in var_a_list:
+                self.mid_abc_a_box.selection_set(codes_index[item])
+            
+            #self.mid_abc_b_box
+            var_b_list = new_config['B'].split(',')            
+            for item in var_b_list:
+                self.mid_abc_b_box.select_set(codes_index[item])
+
+            #self.mid_abc_c_box
+            if new_config['seqType'] == ABC:
+                var_c_list = new_config['C'].split(',')
+                for item in var_c_list:
+                    self.mid_abc_c_box.select_set(codes_index[item])
+            else:
+                self.mid_abc_c_box.configure(state="disable")
+                self.mid_abc_c_box.update()
+
+            # pause duration
+            self.pause_duration.set(float(new_config['PauseDur']))
+
+            # rounding enabled           
+            if new_config['roundingEnabled'] == 'True':
+                self.rounding_enabled.set(True)
+
+        except Exception as e:
+            print(repr(e))
+            print("FAILED TO FILL WIDGETS ON LOAD!")
+
+        print("Program Widgets filled")
+
+        # write results to screen
+        self.write_to_window("Successfully Loaded config file!")
+
     def reset_config(self):
         "This method resets the all program options"
         # re-initialize key variables used in the UI
@@ -487,6 +663,8 @@ class LenaUI:
             seq_config_string = str(self.seq_config)
             config_save_file.write(seq_config_string)
             self.write_to_window("Configuration successfully saved! ")
+        else:
+            self.write_to_window("Unfilled configuration options!")
             
     def load_instruction_window(self):
         "This method loads a separate window with program instructions"
@@ -496,9 +674,14 @@ class LenaUI:
     def ouput_txt(self, results):
         "This method outputs the analysis results to a .txt file"
         if '.txt' in self.output_format:
+
+            # construct 
+            file_out = "LC2-"+self.batch_store+"-"+self.sequence_type.get()+"-"+str(self.pause_duration.get()).replace('.','p')+"-"+str(self.rounding_enabled.get())+"-"+datetime.datetime.now().strftime('%m%d%y-%H%M')+".txt"
+            print(file_out)
+
             # output code 
             print("Output in .txt")
-            out_file = self.seq_config['outputDirPath'] +'//'+ 'test.txt'
+            out_file = self.seq_config['outputDirPath'] +'//'+ file_out
             with open(out_file,'w') as f:
                 for line in results:
                     f.writelines(line+"\n")
@@ -508,7 +691,9 @@ class LenaUI:
         if '.csv' in self.output_format:
             # output code
             print("Output in .csv")
-            out_file = self.seq_config['outputDirPath'] +'//'+ 'test.csv'
+
+
+            out_file = self.seq_config['outputDirPath'] +'//'+ "LC2-"+self.batch_store+"-"+self.sequence_type.get()+"-"+str(self.pause_duration.get()).replace('.','p')+"-"+str(self.rounding_enabled.get())+"-"+datetime.datetime.now().strftime('%m%d%y-%H%M')+".csv"
             with open( out_file, 'wb') as f:#open csv file to be written in
                 csv_writer = csv.writer(f, delimiter = ',')
                 for line in results:#loop to write rows to csv file
@@ -520,7 +705,7 @@ class LenaUI:
         if '.xlsx' in self.output_format:
             print("Output in .xlsx")
             # create workbook & add sheet
-            out_file = self.seq_config['outputDirPath'] +'//'+ 'test.xlsx'
+            out_file = self.seq_config['outputDirPath'] +'//'+ "LC2-"+self.batch_store+"-"+self.sequence_type.get()+"-"+str(self.pause_duration.get()).replace('.','p')+"-"+str(self.rounding_enabled.get())+"-"+datetime.datetime.now().strftime('%m%d%y-%H%M')+".xlsx"
             workbook = xlsxwriter.Workbook(out_file)
             worksheet = workbook.add_worksheet()
 
@@ -537,9 +722,6 @@ class LenaUI:
 
             # close file
             workbook.close()
-
-    def reset_all_widgets(self):
-        "This method resets all widgets"
 
     def close_program(self):
         "This method closes the program"
