@@ -76,15 +76,11 @@ class LenaUI:
         root.config(menu=menubar) # attach menubar to root window
 
         # file menu
-        file_menu = Menu(menubar) # create "File" menu item 
-        file_menu.add_command(label="Exit", command=self.close_program) # add a command to "File" menu item
+        file_menu = Menu(menubar) # create "File" menu item     
+        file_menu.add_command(label="Instructions", command=self.load_instruction_window) # add a command to "Help" menu item
+        file_menu.add_command(label="Change Thread Count", command=self.new_threads_window)
+        file_menu.add_command(label="Exit", command=self.close_program) # add a command to "File" menu item    
         menubar.add_cascade(label="File", menu=file_menu)   # attach "File" menu item to menubar
-        
-        # help menu
-        help_menu = Menu(menubar) # create "Help" menu item 
-        help_menu.add_command(label="Instructions", command=self.load_instruction_window) # add a command to "Help" menu item
-        help_menu.add_command(label="Thread Count", command=self.new_threads_window)
-        menubar.add_cascade(label="Help", menu=help_menu) # attach "Help" menu item to helpbar
 
         # setup main frames to grid
         # top, mid, btm frames laid out inside main_frame
@@ -353,25 +349,27 @@ class LenaUI:
 
     def sequence_analysis(self):
         # disable window
-        self.write_to_window("Performing analysis!")
         self.disable_widgets()
-            
+        
         # threading vars
         results = []
         tLock = threading.Lock()
         self.get_its_files()
         t = time.time()
 
-        # progress bar setup
-        progress = 30
+        # check .its files + setup progress bar
+        item_count = len(self.its_file_dict.items)
+        if item_count < 1:
+            self.write_to_window("No .its file found in input directory!")
+            self.enable_widgets()
+            return
+        incr = int(200 / item_count)
+        progress = 30                                   
         self.btm_progress_bar['value']=progress
         self.btm_progress_bar['maximum']=200
-        item_count = len(self.its_file_dict.items)
-        print(item_count)
-        incr = int(200 / item_count)
-        print(incr)
 
         # file writing prep
+        self.write_to_window("Performing analysis!")
         if len(self.its_file_dict.items) == 1:
             self.batch_store = "Single"
         else:
@@ -508,7 +506,7 @@ class LenaUI:
             self.seq_config['batDir'] = new_config['batDir']            
 
             self.seq_config['A'] =  new_config['A']
-
+             
             self.seq_config['B'] = new_config['B']
 
             self.seq_config['C'] = new_config['C']     
@@ -571,17 +569,20 @@ class LenaUI:
             var_a_list = new_config['A'].split(',')
             for item in var_a_list:
                 self.mid_abc_a_box.selection_set(codes_index[item])
+                self.var_a.append(item)
             
             #self.mid_abc_b_box
             var_b_list = new_config['B'].split(',')            
             for item in var_b_list:
                 self.mid_abc_b_box.select_set(codes_index[item])
+                self.var_b.append(item)
 
             #self.mid_abc_c_box
             if new_config['seqType'] == ABC:
                 var_c_list = new_config['C'].split(',')
                 for item in var_c_list:
                     self.mid_abc_c_box.select_set(codes_index[item])
+                    self.var_c.append(item)
             else:
                 self.mid_abc_c_box.configure(state="disable")
                 self.mid_abc_c_box.update()
