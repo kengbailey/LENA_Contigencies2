@@ -424,8 +424,8 @@ class LenaUI:
         
         # file dialog - select file
         config_load_file = tkFileDialog.askopenfilename(initialdir="/", title="Select config file", filetypes=(("leco files", "*.leco"), ("all files", "*.*")))
-        while not config_load_file.endswith('.leco'):
-             config_load_file = tkFileDialog.askopenfilename(initialdir="/", title="Select config file (.leco)", filetypes=(("leco files", "*.leco"), ("all files", "*.*")))
+        if not str(config_load_file).endswith('.leco'):
+            return
         
         print("Loaded File")
 
