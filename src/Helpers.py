@@ -21,11 +21,9 @@ class StopMe:
 # Sequence Analysis Data Object
 # Holds all items needed for analysis
 class SeqData:
-    p_ID = None
-    path = None
+    its_dict = None
     seq_config = None
 
-    def __init__(self, p_ID, path, seq_config):
-        self.p_ID = p_ID
-        self.path = path
+    def __init__(self, its_dict, seq_config):
+        self.its_dict = its_dict
         self.seq_config = seq_config
