@@ -194,7 +194,7 @@ class SeqAnalysis:
 
 		# setup workers
 		for i in range(seqData.num_threads):
-			t = threading.Thread(target=self.Perform, args=(stopper,))         # pass lock and q to each thread
+			t = threading.Thread(target=self.Perform, args=(stopper,))         # pass stopper
         	t.daemon = True
         	self.threads.append(t)
 		

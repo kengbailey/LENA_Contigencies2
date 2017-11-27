@@ -76,7 +76,7 @@ class LenaUI:
         # file menu
         file_menu = Menu(menubar) # create "File" menu item     
         file_menu.add_command(label="Instructions", command=self.load_instruction_window) # add a command to "Help" menu item
-        file_menu.add_command(label="Change Thread Count", command=self.new_threads_window)
+        file_menu.add_command(label="Change Thread Count", command=self.change_threads_window)
         file_menu.add_command(label="Exit", command=self.close_program) # add a command to "File" menu item    
         menubar.add_cascade(label="File", menu=file_menu)   # attach "File" menu item to menubar
 
@@ -97,7 +97,8 @@ class LenaUI:
         if platform.system() == MAC:
             os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
-    def new_threads_window(self):
+    def change_threads_window(self):
+        "Window for changing the number of threads used by SequenceAnalysis"
         # setup
         t = Toplevel(self.root)
         t.resizable(False, False)
@@ -114,18 +115,22 @@ class LenaUI:
         s.grid(row=1, column=0, sticky=W, padx=15, pady=5)
         b.grid(row=1,column=0, sticky=E, padx=15, pady=5)
 
-    def change_pause_legnthU(self, event):
+    def change_pause_duration_up(self, event):
+        "Updates(+.01) pause duration variable. Bound to mid_pause_up_btn."
         if self.pause_duration.get() < 10.0:
             self.pause_duration.set(round(self.pause_duration.get()+0.1,1))
 
-    def change_pause_lengthD(self, event):
+    def change_pause_duration_down(self, event):
+        "Updates(-.01) pause duration variable. Bound to mid_pause_dn_btn."
         if self.pause_duration.get() >= 0.1:
             self.pause_duration.set(round(self.pause_duration.get()-0.1,1))
 
-    def rounding_pause_length(self,event):
+    def change_pause_duration_slider(self,event):
+        "Updates pause duration variable. Bound to mid_pause_slider."
         self.pause_duration.set(round(self.pause_duration.get(),1))
 
     def setup_top_frame(self):
+        "Configure top frame. Includes save, load, reset, input, output, and output selection(txt/csv/xlsx)."
         # TOP FRAME CONFIG
         # Create top frame widgets
         self.csv_var = BooleanVar() # holds user selection for csv output
@@ -167,8 +172,8 @@ class LenaUI:
         top_load_btn.grid(row=0, column=2)
         top_save_btn.grid(row=0, column=1)
 
-    def update_var(self, event):
-
+    def change_abc_var(self, event):
+        "Updates var_a, var_b, or var_c. Bound to mid_abc_a_box, mid_abc_b_box, and mid_abc_a_box."
         # get user selection; id -> value
         selection = event.widget.curselection()
         templist = []
@@ -187,6 +192,7 @@ class LenaUI:
             print("C: "+str(self.var_c))
 
     def setup_mid_frame(self):
+        "Configure mid frame. Includes sequence type selection and variable selection(a,b,c)."
         # MID FRAME CONFIG
         # create mid frame widgets
         code_vars = StringVar(value=codes)
@@ -195,9 +201,9 @@ class LenaUI:
         self.mid_abc_b_box = Listbox(self.mid_frame, height=16, listvariable=code_vars, selectmode=MULTIPLE, width=9, exportselection=False)
         self.mid_abc_c_box = Listbox(self.mid_frame, height=16, listvariable=code_vars, selectmode=MULTIPLE, width=9, exportselection=False)
         
-        self.mid_abc_a_box.bind("<<ListboxSelect>>", self.update_var)
-        self.mid_abc_b_box.bind("<<ListboxSelect>>", self.update_var)
-        self.mid_abc_c_box.bind("<<ListboxSelect>>", self.update_var)
+        self.mid_abc_a_box.bind("<<ListboxSelect>>", self.change_abc_var)
+        self.mid_abc_b_box.bind("<<ListboxSelect>>", self.change_abc_var)
+        self.mid_abc_c_box.bind("<<ListboxSelect>>", self.change_abc_var)
 
         def disable_c():
             self.mid_abc_c_box.configure(state="disable")
@@ -219,9 +225,9 @@ class LenaUI:
         mid_filler_label2 = ttk.Label(self.mid_frame, text="     ")
         mid_pause_label = ttk.Label(self.mid_frame, text="Pause Duration")
         mid_filler_label3 = ttk.Label(self.mid_frame, text="     ")
-        self.mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=10.0, variable=self.pause_duration,command=lambda r: self.rounding_pause_length(self))
-        mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_lengthD(self), width=1)
-        mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_legnthU(self), width=1)
+        self.mid_pause_slider = ttk.Scale(self.mid_frame, orient=HORIZONTAL, length=100, from_=0.0, to=10.0, variable=self.pause_duration,command=lambda r: self.change_pause_duration_slider(self))
+        mid_pause_dn_btn = ttk.Button(self.mid_frame, text="<", command=lambda: self.change_pause_duration_down(self), width=1)
+        mid_pause_up_btn = ttk.Button(self.mid_frame, text=">", command=lambda: self.change_pause_duration_up(self), width=1)
         self.mid_pause_entry = ttk.Entry(self.mid_frame, textvariable=self.pause_duration, width=4)
         self.mid_pause_checkbox = ttk.Checkbutton(self.mid_frame, text="Enable rounding", variable=self.rounding_enabled,onvalue=True, offvalue=False)
 
@@ -245,6 +251,7 @@ class LenaUI:
         self.mid_pause_checkbox.grid(row=8, column=0, pady=4, columnspan=4)
 
     def setup_btm_frame(self):
+        "Configure bottom frame. Inlcudes progress bar, submit/cancel button, and message window."
         # BOTTOM FRAME CONFIG
         # create bottom frame widgets
 
@@ -259,11 +266,13 @@ class LenaUI:
         self.btm_text_window.grid(row=1, column=0, columnspan=2)
 
     def select_input_dir(self):
+        "Updates input_dir variable. Bound to top_in_browse_btn."
         input_dir = tkFileDialog.askdirectory()
         if input_dir:
             self.input_dir.set(input_dir)
 
     def select_output_dir(self):
+        "Updates output_dir variable. Bound to top_out_browse_btn."
         output_dir = tkFileDialog.askdirectory()
         if output_dir:            
             self.output_dir.set(output_dir)
@@ -271,7 +280,6 @@ class LenaUI:
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
         tempDict = Batch(self.input_dir.get())
-        self.its_file_dict = {}
         for i in range(len(tempDict.items)):
             tempItem = tempDict.items.popitem()
             self.its_file_dict.update({tempItem[0]:tempItem[1][0]})
@@ -338,6 +346,7 @@ class LenaUI:
         return True
 
     def kill_threads(self):
+        "Sends stop message to all threads and updates UI."
         # set stopper - threads will close
         self.stopper.set()
 
@@ -347,7 +356,7 @@ class LenaUI:
         self.btm_progress_bar.stop()
 
     def watch_status(self):
-        "This method watches for analysis finish or user cancel"
+        "This method watches for analysis finish or user cancel. Started after pressing the submit button, but not before checking+setting seq_config."
         while True:
             if len(self.seq_run_results) > 0:
                 # configure UI
@@ -370,10 +379,11 @@ class LenaUI:
                 break
 
     def start_analysis(self):
-        " starts analysis thread; this needs to be run as a thread so we don't interrupt the main UI thread"
+        "Starts run_seqanalysis thread. run_seqanalysis needs to be run as a thread so we don't interrupt the main UI thread."
         # setup
         self.stopper = threading.Event()
         self.btm_submit_btn.configure(state=DISABLED)
+
         # start analysis thread
         t = threading.Thread(target=self.run_seqanalysis)
         t.start()
@@ -389,6 +399,7 @@ class LenaUI:
         start = time.time()
         r = self.set_config()
         if r != True:
+            # set_config already output to window
             self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
             self.btm_submit_btn.configure(state='enable')
             self.btm_progress_bar.stop()
@@ -409,7 +420,7 @@ class LenaUI:
         th = threading.Thread(target=self.watch_status)
         th.start()
 
-        # update UI - now running
+        # enable cancel button
         self.btm_submit_btn.configure(state='enable')
         self.btm_submit_btn.configure(text="Cancel", command=self.kill_threads)
 
