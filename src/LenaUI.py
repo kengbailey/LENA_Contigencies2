@@ -17,11 +17,9 @@ import os
 import platform
 import threading
 import time
-import xlsxwriter
 import ast
-import csv
 import tkMessageBox
-import datetime
+from Helpers import *
 
 MAC = 'Darwin'
 AB = 'A_B'
@@ -62,8 +60,8 @@ class LenaUI:
         self.output_msg_counter = 0
         self.num_threads = IntVar()
         self.num_threads.set(4)
-        self.batch_store = None
-        
+        self.start_time = None
+        self.seq_run_results = []
 
         # Create main frames
         main_frame = ttk.Frame(self.root) # top, mid, btm frames embedded within this frame
@@ -250,13 +248,13 @@ class LenaUI:
         # BOTTOM FRAME CONFIG
         # create bottom frame widgets
 
-        btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.run_seqanalysis)
-        self.btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='determinate')
+        self.btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.start_analysis)
+        self.btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='indeterminate')
         self.btm_text_window = Text(self.btm_frame, width=45, height=5)
         self.btm_text_window.config(state=DISABLED)
 
         # arrange bottom frame widgets
-        btm_submit_btn.grid(row=0, column=1)
+        self.btm_submit_btn.grid(row=0, column=1)
         self.btm_progress_bar.grid(row=0, column=0)
         self.btm_text_window.grid(row=1, column=0, columnspan=2)
 
@@ -272,7 +270,11 @@ class LenaUI:
 
     def get_its_files(self):
         "This method looks creates a dict of all .its files found in the input directory"
-        self.its_file_dict = Batch(self.input_dir.get())
+        tempDict = Batch(self.input_dir.get())
+        self.its_file_dict = {}
+        for i in range(len(tempDict.items)):
+            tempItem = tempDict.items.popitem()
+            self.its_file_dict.update({tempItem[0]:tempItem[1][0]})
 
     def check_config(self):
         "This method checks if all seq_config values are set. Returns error message if any aren't set."
@@ -335,89 +337,89 @@ class LenaUI:
         self.write_to_window("Config options assembled!")
         return True
 
+    def kill_threads(self):
+        # set stopper - threads will close
+        self.stopper.set()
+
+        # update UI
+        self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
+        self.enable_widgets()
+        self.btm_progress_bar.stop()
+
+    def watch_status(self):
+        "This method watches for analysis finish or user cancel"
+        while True:
+            if len(self.seq_run_results) > 0:
+                # configure UI
+                self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
+                self.enable_widgets()
+                self.btm_progress_bar.stop()
+                self.write_to_window(self.seq_run_results[0] + " Ran in "+str(round(time.time()-self.start_time,2))+"s")
+
+                # reset check var
+                self.seq_run_results = []
+                self.stopper = None
+                break
+            elif self.stopper.is_set():
+                # alert user
+                self.write_to_window("Analysis Cancelled!")
+
+                # reset check var
+                self.seq_run_results = []
+                self.stopper = None
+                break
+
+    def start_analysis(self):
+        " starts analysis thread; this needs to be run as a thread so we don't interrupt the main UI thread"
+        # setup
+        self.stopper = threading.Event()
+        self.btm_submit_btn.configure(state=DISABLED)
+        # start analysis thread
+        t = threading.Thread(target=self.run_seqanalysis)
+        t.start()
+
     def run_seqanalysis(self):
         "This method performs the sequence analysis on all .its files"
-        
+        # setup
+        self.start_time = time.time()
+        self.disable_widgets()
+        self.btm_progress_bar.start()
+
         # check config
+        start = time.time()
         r = self.set_config()
         if r != True:
+            self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
+            self.btm_submit_btn.configure(state='enable')
+            self.btm_progress_bar.stop()
+            self.enable_widgets()
             return 
         
-        # start analysis 
-        thread = threading.Thread(target=self.sequence_analysis)
-        thread.start()
-
-    def sequence_analysis(self):
-        # disable window
-        self.disable_widgets()
-        
-        # threading vars
-        results = []
-        tLock = threading.Lock()
+        # retrieve .its files
         self.get_its_files()
-        t = time.time()
-
-        # check .its files + setup progress bar
-        item_count = len(self.its_file_dict.items)
-        if item_count < 1:
-            self.write_to_window("No .its file found in input directory!")
+        if len(self.its_file_dict) < 1:
+            self.write_to_window("No .its files in input directory!")
+            self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
+            self.btm_submit_btn.configure(state='enable')
+            self.btm_progress_bar.stop()
             self.enable_widgets()
             return
-        incr = int(200 / item_count)
-        progress = 30                                   
-        self.btm_progress_bar['value']=progress
-        self.btm_progress_bar['maximum']=200
 
-        # file writing prep
-        self.write_to_window("Performing analysis!")
-        if len(self.its_file_dict.items) == 1:
-            self.batch_store = "Single"
-        else:
-            self.batch_store = "Batch"+str(len(self.its_file_dict.items))
+        # start watcher thread
+        th = threading.Thread(target=self.watch_status)
+        th.start()
 
-        # run sequence analysis on MAXTHREADS at a time
-        while len(self.its_file_dict.items) > 0:
+        # update UI - now running
+        self.btm_submit_btn.configure(state='enable')
+        self.btm_submit_btn.configure(text="Cancel", command=self.kill_threads)
 
-            # grab its file to process in this batch
-            tempDict = {}
-            threads=[]
-            for i in range(self.num_threads.get()): # num_threads implementation
-                try:
-                    tempItem = self.its_file_dict.items.popitem()
-                    tempDict.update({tempItem[0]:tempItem[1][0]})
-                except KeyError:
-                    pass # dictionary is empty
-            
-            # run analysis on all batch .its files       
-            for k,v in tempDict.iteritems():
-                sa = SeqAnalysis(self.seq_config, k, v)
-                proc = threading.Thread(target=sa.Perform, args=(str(v), results, tLock,))
-                threads.append(proc)
-                proc.start()
-                
-            # wait for threads to finish
-            for proc in threads:
-                proc.join()
-                progress = progress + incr
-                if progress > 200: progress = 200
-                self.btm_progress_bar['value'] = progress
-                print("thread done: "+proc.getName())
-            done = time.time()-t
-        
-        # output file in parallel
-        threads = []
-        csv_proc = threading.Thread(target=self.output_csv, args=(results,))
-        txt_proc = threading.Thread(target=self.ouput_txt, args=(results,))
-        xl_proc = threading.Thread(target=self.output_xlsx, args=(results,))
-        threads.extend([csv_proc, txt_proc, xl_proc])
-        for proc in threads:
-            proc.start()
-        for proc in threads:
-            proc.join()
-        
-        # send success message to window
-        self.write_to_window("Successfully Sequence Analysis! Files processed in {} seconds".format(round(done, 2)))
-        self.enable_widgets()
+        # create object to send to analysis
+        data = SeqData(self.its_file_dict, self.seq_config, self.num_threads.get(), self.output_format)
+        self.seq_run_results = []
+
+        # kick off analysis 
+        thread = threading.Thread(target=SeqAnalysis, args=(data,self.seq_run_results, self.stopper))
+        thread.start()
          
     def load_config(self):
         "This method loads a config file for the program"
@@ -671,58 +673,6 @@ class LenaUI:
         "This method loads a separate window with program instructions"
         instruction_var = self.list_instructions() 
         tkMessageBox.showinfo("Instructions",self.list_instructions())
-    
-    def ouput_txt(self, results):
-        "This method outputs the analysis results to a .txt file"
-        if '.txt' in self.output_format:
-
-            # construct 
-            file_out = "LC2-"+self.batch_store+"-"+self.sequence_type.get()+"-"+str(self.pause_duration.get()).replace('.','p')+"-"+str(self.rounding_enabled.get())+"-"+datetime.datetime.now().strftime('%m%d%y-%H%M')+".txt"
-            print(file_out)
-
-            # output code 
-            print("Output in .txt")
-            out_file = self.seq_config['outputDirPath'] +'//'+ file_out
-            with open(out_file,'w') as f:
-                for line in results:
-                    f.writelines(line+"\n")
-
-    def output_csv(self, results):
-        "This method outputs the analysis results to a .csv file"
-        if '.csv' in self.output_format:
-            # output code
-            print("Output in .csv")
-
-
-            out_file = self.seq_config['outputDirPath'] +'//'+ "LC2-"+self.batch_store+"-"+self.sequence_type.get()+"-"+str(self.pause_duration.get()).replace('.','p')+"-"+str(self.rounding_enabled.get())+"-"+datetime.datetime.now().strftime('%m%d%y-%H%M')+".csv"
-            with open( out_file, 'wb') as f:#open csv file to be written in
-                csv_writer = csv.writer(f, delimiter = ',')
-                for line in results:#loop to write rows to csv file
-                    line = line.split(',')
-                    csv_writer.writerow(line)
-
-    def output_xlsx(self, results):
-        "This method outputs the analysis results to a .xlsx file"
-        if '.xlsx' in self.output_format:
-            print("Output in .xlsx")
-            # create workbook & add sheet
-            out_file = self.seq_config['outputDirPath'] +'//'+ "LC2-"+self.batch_store+"-"+self.sequence_type.get()+"-"+str(self.pause_duration.get()).replace('.','p')+"-"+str(self.rounding_enabled.get())+"-"+datetime.datetime.now().strftime('%m%d%y-%H%M')+".xlsx"
-            workbook = xlsxwriter.Workbook(out_file)
-            worksheet = workbook.add_worksheet()
-
-            # start from first cell
-            row = 0
-            
-            # insert into worksheet
-            for line in results:
-                col = 0
-                for cell in str(line).split(","):
-                    worksheet.write(row, col, cell)
-                    col += 1
-                row += 1
-
-            # close file
-            workbook.close()
 
     def close_program(self):
         "This method closes the program"
@@ -800,6 +750,11 @@ class LenaUI:
         self.mid_abc_b_box.update()
         self.mid_abc_c_box.configure(state="normal")
         self.mid_abc_c_box.update()
+
+        # conditional seqType
+        if self.sequence_type.get() == AB:
+            self.mid_abc_c_box.configure(state="disable")
+            self.mid_abc_c_box.update()
     
     def list_instructions(self):
         instruction_var = "1) SAVE:  Saves all the data currently in all fields.\n"

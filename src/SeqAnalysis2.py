@@ -12,6 +12,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 import os
+import threading
+import Queue
+from Helpers import *
 
 # Event Item
 class EItem:
@@ -23,7 +26,6 @@ class EItem:
 	def GetFloatTime(self,arg='onset'):
 		t = self.onset[2:-1] if arg=='onset' else self.offset[2:-1]
 		return float(t)
-
 
 # Event Item List
 class EItemList:
@@ -175,58 +177,120 @@ class EItemList:
 		return rt
 	
 class SeqAnalysis:
-	def __init__(self, varMap, pID, path):
-		self.pID=pID
-		self.path=path
-		self.varMap = varMap
+	def __init__(self, seqData, out_results, stopper):
 
-	def Perform(self, path, results, tLock):
-		# Announce
-		print 'Analysis in progress on pID=' + str(self.pID) + ', file=' + path
+		# extract items from seqData object
+		self.varMap = seqData.seq_config
 
-		# Define necessary objects
-		eiList = None
-		tree = None
+		# setup vars
+		self.results = []
+		self.out_results = out_results
+		self.error_results = []
 
-		# INITIALIZE ESSENTIAL OBJECTS
-		#Init event item list
-		eiList = EItemList(_varMap=self.varMap, pid=self.pID, its_filename=path)
+		# thread + queue setup
+		self.tLock = threading.Lock()
+		self.q = Queue.Queue()
+		self.threads = []
 
-		#Load xml tree
-		tree = ET.parse(path)
+		# setup workers
+		for i in range(seqData.num_threads):
+			t = threading.Thread(target=self.Perform, args=(stopper,))         # pass lock and q to each thread
+        	t.daemon = True
+        	self.threads.append(t)
+		
+		# start workers
+		for thread in self.threads:
+			thread.start()
 
-		#Get access to only the conversational segments in the .its file
-		recNode = tree.find("ProcessingUnit")
-		segs = list(recNode.iter("Segment"))
+		# fill queue
+		for k,v in seqData.its_dict.iteritems():
+			data = SeqRun(k, v)
+			self.q.put(data)
 
-		# iterate over segments and copy
-		eiList.AddEItem( segs[0], flag='Initial' )
-		for i in range(1, len(segs)-1):
-			eiList.AddEItem( segs[i] )
-		eiList.AddEItem( segs[-1], flag='Terminal' )
+		# catch threads
+		self.q.join()
 
-		# free memory used by xml tree
-		tree = None
+		if not stopper.is_set():
+			# write output
+			batch_single = None
+			if len(seqData.its_dict) > 1:
+				batch_single = "Batch"
+			else:
+				batch_single = "Single"
+			output_data = OutData(batch_single, seqData.seq_config,self.results, seqData.output_format)
+			output_xlsx(output_data)
+			output_csv(output_data)
+			ouput_txt(output_data)
 
-		#Insert contiguous pauses
-		eiList.InsertPauses()
+			# report analysis result
+			if len(self.error_results) > 0:
+				self.out_results.append("Failed Sequence Analysis!")
+			else:
+				self.out_results.append("Successfully Sequence Analysis!")
 
-		#Tally each item in the EItemList
-		eiList.TallyItems()
 
-		#Perform primary analysis
-		eiList.SeqAn()
+	def Perform(self, stopper):
+		# retrieve work items from queue
+		while not stopper.is_set():
+			run_data = self.q.get(True)
+			pID = run_data.p_id
+			path = run_data.path
 
-		#write data and break from loop
-		elh = eiList.Header()
-		outputContent = ""
-		if len(results) == 0:
-			with tLock:
-				results.append(elh)
+			try:
+				# Announce
+				print 'Analysis in progress on pID=' + str(pID) + ', file=' + path
 
-		outputContent += eiList.ResultsTuple()
+				# Define necessary objects
+				eiList = None
+				tree = None
 
-		# write data with Lock on results
-		with tLock:
-			results.append(outputContent)
+				# INITIALIZE ESSENTIAL OBJECTS
+				#Init event item list
+				eiList = EItemList(_varMap=self.varMap, pid=pID, its_filename=path)
+
+				#Load xml tree
+				tree = ET.parse(path)
+
+				#Get access to only the conversational segments in the .its file
+				recNode = tree.find("ProcessingUnit")
+				segs = list(recNode.iter("Segment"))
+
+				# iterate over segments and copy
+				eiList.AddEItem( segs[0], flag='Initial' )
+				for i in range(1, len(segs)-1):
+					eiList.AddEItem( segs[i] )
+				eiList.AddEItem( segs[-1], flag='Terminal' )
+
+				# free memory used by xml tree
+				tree = None
+
+				#Insert contiguous pauses
+				eiList.InsertPauses()
+
+				#Tally each item in the EItemList
+				eiList.TallyItems()
+
+				#Perform primary analysis
+				eiList.SeqAn()
+
+				#write data and break from loop
+				elh = eiList.Header()
+				outputContent = ""
+				with self.tLock:
+					if len(self.results) == 0:
+						self.results.append(elh)
+
+				outputContent += eiList.ResultsTuple()
+
+				# write data with Lock on results
+				with self.tLock:
+					self.results.append(outputContent)
+
+			# Log All Errors
+			except Exception as e:
+				self.error_results.append(str(e))
+
+			# done with task
+			self.q.task_done()
+			
 
