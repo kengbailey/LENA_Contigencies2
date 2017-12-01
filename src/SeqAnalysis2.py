@@ -15,6 +15,7 @@ import os
 import threading
 import Queue
 from Helpers import *
+import math
 
 # Event Item
 class EItem:
@@ -182,41 +183,46 @@ class SeqAnalysis:
 		# extract items from seqData object
 		self.varMap = seqData.seq_config
 
+		# prime for writing output
+		batch_single = None
+		if len(seqData.its_dict) > 1:
+			batch_single = "Batch"
+		else:
+			batch_single = "Single"
+
 		# setup vars
 		self.results = []
 		self.out_results = out_results
 		self.error_results = []
-
-		# thread + queue setup
+		self.stopper = stopper
 		self.tLock = threading.Lock()
-		self.q = Queue.Queue()
-		self.threads = []
 
-		# setup workers
-		for i in range(seqData.num_threads):
-			t = threading.Thread(target=self.Perform, args=(stopper,))         # pass stopper
-        	t.daemon = True
-        	self.threads.append(t)
-		
-		# start workers
-		for thread in self.threads:
-			thread.start()
+		# kick off threads in batch
+		while len(seqData.its_dict) > 0:
+			# prep for run
+			tempItem = {}
+			tempDict = {}
+			threads = []
+			for i in range(seqData.num_threads):
+				try:
+					tempItem = seqData.its_dict.popitem()
+					tempDict.update({tempItem[0]:tempItem[1]})
+				except KeyError:
+					pass # dict is empty
+			
+			# perform run
+			for k,v in tempDict.iteritems():
+				t = threading.Thread(target=self.Perform, args=(k,v,))
+				t.daemon = True
+				threads.append(t)
+				t.start()
 
-		# fill queue
-		for k,v in seqData.its_dict.iteritems():
-			data = SeqRun(k, v)
-			self.q.put(data)
-
-		# catch threads
-		self.q.join()
+			# wait for threads
+			for thread in threads:
+				thread.join()
 
 		if not stopper.is_set():
 			# write output
-			batch_single = None
-			if len(seqData.its_dict) > 1:
-				batch_single = "Batch"
-			else:
-				batch_single = "Single"
 			output_data = OutData(batch_single, seqData.seq_config,self.results, seqData.output_format)
 			output_xlsx(output_data)
 			output_csv(output_data)
@@ -229,13 +235,9 @@ class SeqAnalysis:
 				self.out_results.append("Successfully Sequence Analysis!")
 
 
-	def Perform(self, stopper):
+	def Perform(self, pID, path):
 		# retrieve work items from queue
-		while not stopper.is_set():
-			run_data = self.q.get(True)
-			pID = run_data.p_id
-			path = run_data.path
-
+		if not self.stopper.is_set():
 			try:
 				# Announce
 				print 'Analysis in progress on pID=' + str(pID) + ', file=' + path
@@ -288,9 +290,5 @@ class SeqAnalysis:
 
 			# Log All Errors
 			except Exception as e:
-				self.error_results.append(str(e))
-
-			# done with task
-			self.q.task_done()
-			
-
+				with self.tLock:
+					self.error_results.append(str(e))
