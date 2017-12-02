@@ -13,8 +13,9 @@ GUI for computing contingency tables from .its files.
 
 ## How To Build Program (Windows)
 
-1. install py2exe >> pip install 
-2. Build e
+1. install py2exe >> pip install py2exe_py2
+2. Build executable >> python py2exe_build py2exe
+3. Build installer using Inno Setupp >> http://www.jrsoftware.org/isinfo.php
 
 ## License
 
@@ -22,6 +23,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+* Program forked from https://github.com/HomeBankCode/LENA_contingencies
