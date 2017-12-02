@@ -223,10 +223,13 @@ class SeqAnalysis:
 
 		if not stopper.is_set():
 			# write output
-			output_data = OutData(batch_single, seqData.seq_config,self.results, seqData.output_format)
-			output_xlsx(output_data)
-			output_csv(output_data)
-			ouput_txt(output_data)
+			output_data = OutData(batch_single, seqData.seq_config,self.results)
+			if '.xlsx' in seqData.output_format:
+				output_xlsx(output_data)
+			if '.csv' in seqData.output_format:
+				output_csv(output_data)
+			if '.txt' in seqData.output_format:
+				ouput_txt(output_data)
 
 			# report analysis result
 			if len(self.error_results) > 0:

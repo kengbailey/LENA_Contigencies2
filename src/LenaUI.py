@@ -357,7 +357,7 @@ class LenaUI:
 
         # update UI
         self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
-        self.enable_widgets()
+        #self.enable_widgets()
         self.btm_progress_bar.stop()
 
     def watch_status(self):
@@ -366,7 +366,7 @@ class LenaUI:
             if len(self.seq_run_results) > 0:
                 # configure UI
                 self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
-                self.enable_widgets()
+                #self.enable_widgets()
                 self.btm_progress_bar.stop()
                 self.write_to_window(self.seq_run_results[0] + " Ran in "+str(round(time.time()-self.start_time,2))+"s")
 
@@ -391,13 +391,14 @@ class LenaUI:
 
         # start analysis thread
         t = threading.Thread(target=self.run_seqanalysis)
+        t.daemon = True
         t.start()
 
     def run_seqanalysis(self):
         "This method performs the sequence analysis on all .its files"
         # setup
         self.start_time = time.time()
-        self.disable_widgets()
+        #self.disable_widgets()
         self.btm_progress_bar.start()
 
         # check config
@@ -408,7 +409,7 @@ class LenaUI:
             self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
             self.btm_submit_btn.configure(state='enable')
             self.btm_progress_bar.stop()
-            self.enable_widgets()
+            #self.enable_widgets()
             return 
         
         # retrieve .its files
@@ -418,11 +419,12 @@ class LenaUI:
             self.btm_submit_btn.configure(text="Submit", command=self.start_analysis)
             self.btm_submit_btn.configure(state='enable')
             self.btm_progress_bar.stop()
-            self.enable_widgets()
+            #self.enable_widgets()
             return
 
         # start watcher thread
         th = threading.Thread(target=self.watch_status)
+        th.daemon = True
         th.start()
 
         # enable cancel button
@@ -435,6 +437,7 @@ class LenaUI:
 
         # kick off analysis 
         thread = threading.Thread(target=SeqAnalysis, args=(data,self.seq_run_results, self.stopper))
+        thread.daemon = True
         thread.start()
          
     def load_config(self):
