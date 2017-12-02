@@ -2,6 +2,8 @@
 
 GUI for computing contingency tables from .its files.
 
+![alt text](https://i.imgur.com/Wopaloh.png)
+
 ## How To Run
 
 1. Install latest build from build directory
@@ -14,7 +16,8 @@ GUI for computing contingency tables from .its files.
 ## How To Build Program (Windows)
 
 1. install py2exe >> pip install py2exe_py2
-2. Build executable >> python py2exe_build py2exe
+2. Move icon from from icon directory to src directory
+2. Build executable from src directory >> python py2exe_build py2exe
 3. Build installer using Inno Setupp >> http://www.jrsoftware.org/isinfo.php
 
 ## License
