@@ -22,6 +22,7 @@ import tkMessageBox
 from Helpers import *
 
 MAC = 'Darwin'
+WINDOWS = 'Windows'
 AB = 'A_B'
 ABC = 'AB_C'
 OK = 'ok'
@@ -65,9 +66,9 @@ class LenaUI:
 
         # Create main frames
         main_frame = ttk.Frame(self.root) # top, mid, btm frames embedded within this frame
-        self.top_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=300, height=150)
-        self.mid_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=300, height=300)
-        self.btm_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=300, height=100)
+        self.top_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=200, height=150)
+        self.mid_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=200, height=300)
+        self.btm_frame = ttk.Frame(main_frame, borderwidth=5, relief="sunken", width=200, height=100)
 
         # create menu
         menubar = Menu(root) # create menu bar
@@ -256,14 +257,18 @@ class LenaUI:
         # create bottom frame widgets
 
         self.btm_submit_btn = ttk.Button(self.btm_frame, text="Submit", command=self.start_analysis)
-        self.btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=200, mode='indeterminate')
-        self.btm_text_window = Text(self.btm_frame, width=45, height=5)
+        self.btm_progress_bar = ttk.Progressbar(self.btm_frame, orient=HORIZONTAL, length=170, mode='indeterminate')
+        self.btm_text_window = None
+        if platform.system() == MAC:
+            self.btm_text_window = Text(self.btm_frame, width=45, height=5)
+        elif platform.system() == WINDOWS:
+            self.btm_text_window = Text(self.btm_frame, width=34, height=5)
         self.btm_text_window.config(state=DISABLED)
 
         # arrange bottom frame widgets
-        self.btm_submit_btn.grid(row=0, column=1)
-        self.btm_progress_bar.grid(row=0, column=0)
-        self.btm_text_window.grid(row=1, column=0, columnspan=2)
+        self.btm_submit_btn.grid(row=0, column=0, sticky=E)
+        self.btm_progress_bar.grid(row=0, column=0, sticky=W)
+        self.btm_text_window.grid(row=1, column=0, columnspan=1)
 
     def select_input_dir(self):
         "Updates input_dir variable. Bound to top_in_browse_btn."
@@ -745,12 +750,12 @@ class LenaUI:
         "This method enables top and mid widgets"
         for child in self.top_frame.winfo_children():
             try:
-                child.configure(state='enable')
+                child.configure(state='normal')
             except:
                 pass
         for child in self.mid_frame.winfo_children():
             try:
-                child.configure(state='enable')
+                child.configure(state='normal')
             except:
                 pass
         
